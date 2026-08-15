@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f4ead7">
+<title>SCARABOCCHIO!</title>
+<style>
+:root{
+  --bg:#f4ead7;--panel:#fffaf0;--ink:#241f1a;--muted:#6e6256;--accent:#c45234;
+  --accent2:#2c6e75;--good:#2f7d4a;--bad:#a33b2f;--line:#dbcdb8;--shadow:0 12px 35px #0002;
+}
+body.dark{
+  --bg:#171717;--panel:#242220;--ink:#f7efe4;--muted:#c3b7a7;--accent:#ef7d5f;
+  --accent2:#73b9bf;--good:#74c18b;--bad:#ef7d6d;--line:#45413b;--shadow:0 12px 35px #0008;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:ui-rounded,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
+button,select,input{font:inherit}
+button{cursor:pointer}
+.app{min-height:100vh;display:flex;flex-direction:column}
+header{
+  position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;
+  gap:12px;padding:12px max(14px,env(safe-area-inset-left));background:color-mix(in srgb,var(--bg) 88%, transparent);
+  backdrop-filter:blur(12px);border-bottom:1px solid var(--line)
+}
+.brand{font-weight:1000;letter-spacing:.08em}
+.headerBtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.iconBtn{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:14px;padding:9px 12px;font-weight:800}
+main{width:min(980px,100%);margin:0 auto;padding:24px 16px 80px;flex:1}
+.hero{text-align:center;margin:10px auto 24px}
+.hero h1{font-size:clamp(2.35rem,8vw,5.4rem);line-height:.9;margin:.15em 0;color:var(--accent);text-shadow:0 3px 0 #0001}
+.hero p{color:var(--muted);font-weight:700;max-width:700px;margin:12px auto}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:var(--shadow);margin:16px 0}
+.grid{display:grid;gap:14px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+label{font-weight:900;display:block;margin-bottom:6px}
+select,input{
+  width:100%;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:12px 13px;outline:none
+}
+select:focus,input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent2) 20%, transparent)}
+.teamRow{display:grid;grid-template-columns:1.35fr 1fr;gap:10px;padding:12px 0;border-top:1px dashed var(--line)}
+.teamRow:first-child{border-top:0}
+.primary,.secondary,.danger,.success{
+  border:0;border-radius:18px;padding:15px 20px;font-weight:1000;letter-spacing:.02em
+}
+.primary{background:var(--accent);color:white}
+.secondary{background:var(--accent2);color:white}
+.success{background:var(--good);color:white}
+.danger{background:var(--bad);color:white}
+.big{font-size:1.15rem;min-height:58px}
+.full{width:100%}
+.note{color:var(--muted);font-size:.95rem;line-height:1.45}
+.badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:7px 11px;font-weight:900;background:var(--bg)}
+.hidden{display:none!important}
+.center{text-align:center}
+.turnTeam{font-size:clamp(2rem,8vw,4.5rem);margin:.15em 0;color:var(--accent)}
+.turnMeta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.category{
+  text-align:center;text-transform:uppercase;letter-spacing:.16em;font-size:.9rem;font-weight:1000;color:var(--accent2);margin-bottom:10px
+}
+.secretCard{max-width:720px;margin:18px auto}
+.choice{
+  width:100%;text-align:left;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:20px;
+  padding:16px;margin:8px 0;display:flex;align-items:center;justify-content:space-between;gap:12px
+}
+.choice:hover{border-color:var(--accent2)}
+.choiceText{font-size:clamp(1.15rem,4vw,1.65rem);font-weight:1000}
+.points{white-space:nowrap;font-weight:1000;color:var(--accent)}
+.timerWrap{display:grid;place-items:center;margin:20px auto}
+.timer{
+  --p:100deg;width:min(64vw,310px);aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  background:conic-gradient(var(--accent) var(--p),color-mix(in srgb,var(--line) 70%, transparent) 0);
+  position:relative
+}
+.timer:after{content:"";position:absolute;inset:16px;border-radius:50%;background:var(--panel)}
+.timerText{position:relative;z-index:1;font-size:clamp(3rem,13vw,6.5rem);font-weight:1000;font-variant-numeric:tabular-nums}
+.inPlay{font-size:clamp(1.4rem,5vw,2.2rem);font-weight:1000;color:var(--accent2);margin:12px 0}
+.actionGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:720px;margin:0 auto}
+.scoreList{display:grid;gap:10px;margin-top:14px}
+.scoreRow{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:16px;padding:12px}
+.rank{font-weight:1000;font-size:1.2rem}
+.scoreName{font-weight:1000}
+.scorePts{font-weight:1000;color:var(--accent)}
+.modal{
+  position:fixed;inset:0;z-index:20;background:#0009;display:grid;place-items:center;padding:18px
+}
+.modalBox{
+  width:min(760px,100%);max-height:88vh;overflow:auto;background:var(--panel);color:var(--ink);
+  border:1px solid var(--line);border-radius:24px;padding:20px;box-shadow:0 24px 80px #0008
+}
+.modalTop{display:flex;justify-content:space-between;align-items:center;gap:10px;position:sticky;top:-20px;background:var(--panel);padding:10px 0;z-index:2}
+.modalTop h2{margin:0}
+.closeBtn{border:0;background:var(--bg);color:var(--ink);border-radius:12px;padding:8px 12px;font-weight:1000}
+details{border-top:1px solid var(--line);padding:12px 0}
+summary{font-weight:1000;cursor:pointer}
+li{margin:6px 0}
+.smallBtns{display:flex;gap:8px;flex-wrap:wrap}
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:50;background:var(--ink);color:var(--bg);
+  padding:12px 16px;border-radius:14px;font-weight:900;box-shadow:var(--shadow);max-width:90vw;text-align:center
+}
+.winner{font-size:clamp(1.8rem,7vw,4rem);color:var(--accent);font-weight:1000;margin:.2em 0}
+@media(max-width:680px){
+  .grid.two,.teamRow,.actionGrid{grid-template-columns:1fr}
+  header{align-items:flex-start}
+  .iconBtn{padding:8px 9px;font-size:.88rem}
+  main{padding-top:14px}
+}
+@media(orientation:landscape) and (max-height:520px){
+  main{padding-top:8px}
+  .hero h1{font-size:2.4rem}
+  .hero p{display:none}
+  .timer{width:170px}
+  .timerText{font-size:3.3rem}
+}
+</style>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="SCARABOCCHIO!">
+<meta name="application-name" content="SCARABOCCHIO!">
+<meta name="description" content="Party game di disegno a squadre con livelli di difficoltà personalizzabili.">
+
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">SCARABOCCHIO!</div>
+  <div class="headerBtns">
+    <button class="iconBtn" id="homeBtn">⌂ HOME</button>
+    <button class="iconBtn" id="scoresBtn">★ PUNTI</button>
+    <button class="iconBtn" id="cardsBtn">▤ CARTE</button>
+    <button class="iconBtn" id="infoBtn">ⓘ ISTRUZIONI</button>
+    <button class="iconBtn" id="themeBtn">☾ NOTTE</button>
+  </div>
+</header>
+
+<main>
+<section id="setupScreen">
+  <div class="hero">
+    <h1>SCARABOCCHIO!</h1>
+    <p>Disegna. Fai indovinare. Scegli quanto rischiare.</p>
+    <span class="badge">Tutto resta nel browser · funziona offline</span>
+  </div>
+
+  <div class="card">
+    <h2>NUOVA PARTITA</h2>
+    <div class="grid two">
+      <div><label for="teamCount">Numero di squadre</label>
+        <select id="teamCount"><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select>
+      </div>
+      <div><label for="turnMinutes">Durata di ogni turno</label>
+        <select id="turnMinutes"><option value="1">1 minuto</option><option value="2" selected>2 minuti</option><option value="3">3 minuti</option><option value="4">4 minuti</option><option value="5">5 minuti</option></select>
+      </div>
+      <div><label for="turnsPerTeam">Turni per squadra</label>
+        <select id="turnsPerTeam">
+          <option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option>
+          <option>6</option><option>7</option><option>8</option><option>9</option><option>10</option>
+        </select>
+      </div>
+    </div>
+    <h3>Squadre e livelli</h3>
+    <div id="teamsEditor"></div>
+    <button class="primary big full" id="startBtn">INIZIA LA PARTITA</button>
+    <p class="note">Ogni squadra può avere un livello diverso. Così, per esempio, adulti e bambini possono sfidarsi nella stessa partita.</p>
+  </div>
+</section>
+
+<section id="betweenScreen" class="hidden">
+  <div class="card center">
+    <div class="turnMeta"><span class="badge" id="turnCounter"></span><span class="badge" id="levelBadge"></span></div>
+    <p class="note">È il turno di</p>
+    <div class="turnTeam" id="turnTeam"></div>
+    <p>Consegnate il dispositivo al disegnatore di turno.</p>
+    <button class="primary big" id="showCardBtn">MOSTRA LA CARTA</button>
+  </div>
+  <div class="card"><h3>CLASSIFICA</h3><div id="miniScores" class="scoreList"></div></div>
+</section>
+
+<section id="chooseScreen" class="hidden">
+  <div class="card secretCard">
+    <div class="category" id="cardCategory"></div>
+    <h2 class="center">SCEGLI COSA DISEGNARE</h2>
+    <p class="note center">Puoi comunicare alla squadra la categoria indicata sopra. Il soggetto scelto sparirà appena lo tocchi.</p>
+    <div id="choices"></div>
+    <button class="secondary full" id="changeCardBtn">CAMBIA CARTA · JOLLY DELLA SQUADRA</button><p class="note center" id="changeCardNote">Ogni squadra può cambiare carta una sola volta nell’intera partita.</p>
+  </div>
+</section>
+
+<section id="playScreen" class="hidden">
+  <div class="card center">
+    <div class="turnMeta"><span class="badge" id="playTeam"></span><span class="badge" id="playCategory"></span></div>
+    <div class="inPlay" id="inPlay"></div>
+    <div class="timerWrap"><div class="timer" id="timer"><div class="timerText" id="timerText">02:00</div></div></div>
+    <div class="actionGrid">
+      <button class="success big" id="guessedBtn">✓ INDOVINATO!</button>
+      <button class="danger big" id="abandonBtn">⚑ ABBANDONO</button>
+    </div>
+  </div>
+</section>
+
+<section id="resultScreen" class="hidden">
+  <div class="card center">
+    <h2 id="resultTitle"></h2>
+    <div class="winner" id="resultMain"></div>
+    <p id="resultText"></p>
+    <button class="primary big" id="nextBtn">TURNO SUCCESSIVO</button>
+  </div>
+</section>
+
+<section id="gameOverScreen" class="hidden">
+  <div class="card center">
+    <h2>PARTITA TERMINATA</h2>
+    <div class="winner" id="winnerText"></div>
+    <div id="finalScores" class="scoreList"></div>
+    <button class="primary big full" id="newGameBtn">NUOVA PARTITA</button>
+  </div>
+</section>
+</main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modalBox" id="modalBox"></div></div>
+<div id="toast" class="toast hidden"></div>
+
+<script>
+const BUILTIN = {"OGGETTI":[{"one":"Palla","two":"Ombrello","three":"Sestante"},{"one":"Matita","two":"Cacciavite","three":"Calibro"},{"one":"Sedia","two":"Binocolo","three":"Teodolite"},{"one":"Bicchiere","two":"Cavatappi","three":"Metronomo"},{"one":"Forchetta","two":"Graffettatrice","three":"Barometro"},{"one":"Libro","two":"Annaffiatoio","three":"Astrolabio"},{"one":"Scarpa","two":"Termometro","three":"Clessidra"},{"one":"Orologio","two":"Frullatore","three":"Fonendoscopio"},{"one":"Zaino","two":"Telecomando","three":"Tornio"},{"one":"Chiave","two":"Lucchetto","three":"Mortaio"},{"one":"Candela","two":"Spremiagrumi","three":"Pantografo"},{"one":"Pettine","two":"Salvadanaio","three":"Periscopio"},{"one":"Cuscino","two":"Moka","three":"Bussola"},{"one":"Cappello","two":"Trapano","three":"Manometro"},{"one":"Specchio","two":"Fionda","three":"Mandolino"},{"one":"Telefono","two":"Tostapane","three":"Goniometro"},{"one":"Scopa","two":"Bilancia","three":"Incudine"},{"one":"Tazza","two":"Estintore","three":"Arcolaio"},{"one":"Martello","two":"Cerniera","three":"Stetoscopio"},{"one":"Bottiglia","two":"Ventaglio","three":"Mappamondo"},{"one":"Pennello","two":"Fischietto","three":"Abaco"},{"one":"Forbici","two":"Caffettiera","three":"Giradischi"},{"one":"Portachiavi","two":"Torcia","three":"Macchina da scrivere"},{"one":"Valigia","two":"Rastrello","three":"Proiettore"},{"one":"Cucchiaio","two":"Pinza","three":"Cannocchiale"},{"one":"Bicicletta","two":"Monopattino","three":"Velocipede"},{"one":"Piatto","two":"Scolapasta","three":"Passaverdure"},{"one":"Tavolo","two":"Sgabello","three":"Leggio"},{"one":"Lampada","two":"Lampada frontale","three":"Lanterna di Diogene"},{"one":"Televisore","two":"Videoproiettore","three":"Cinetoscopio"},{"one":"Computer","two":"Joystick","three":"Trackball"},{"one":"Mouse","two":"Tavoletta grafica","three":"Plotter"},{"one":"Penna","two":"Evidenziatore","three":"Pennino stilografico"},{"one":"Quaderno","two":"Raccoglitore","three":"Taccuino Moleskine"},{"one":"Righello","two":"Compasso","three":"Curvilinee"},{"one":"Gomma","two":"Temperamatite","three":"Pantografo da disegno"},{"one":"Frigorifero","two":"Congelatore","three":"Abbattitore"},{"one":"Forno","two":"Friggitrice ad aria","three":"Roner"},{"one":"Pentola","two":"Pentola a pressione","three":"Cocotte"},{"one":"Padella","two":"Wok","three":"Tajine"},{"one":"Coltello","two":"Pelapatate","three":"Mezzaluna"},{"one":"Mestolo","two":"Schiumarola","three":"Mandolina da cucina"},{"one":"Lavatrice","two":"Asciugatrice","three":"Stiratrice a rullo"},{"one":"Aspirapolvere","two":"Lavapavimenti","three":"Battitappeto"},{"one":"Ventilatore","two":"Deumidificatore","three":"Anemometro"},{"one":"Ferro da stiro","two":"Macchina da cucire","three":"Telaio"},{"one":"Spazzolino","two":"Rasoio elettrico","three":"Irrigatore orale"},{"one":"Asciugacapelli","two":"Piastra per capelli","three":"Arricciacapelli"},{"one":"Ombrellone","two":"Sdraio","three":"Amaca"},{"one":"Pallone da calcio","two":"Racchetta da tennis","three":"Giavellotto"},{"one":"Sci","two":"Snowboard","three":"Ciaspole"},{"one":"Casco","two":"Ginocchiere","three":"Imbragatura da arrampicata"},{"one":"Tenda","two":"Sacco a pelo","three":"Fornello da campeggio"},{"one":"Borraccia","two":"Thermos","three":"CamelBak"},{"one":"Portafoglio","two":"Portamonete","three":"Fermasoldi"},{"one":"Occhiali","two":"Lente d'ingrandimento","three":"Monocolo"},{"one":"Anello","two":"Braccialetto","three":"Gemelli da polso"},{"one":"Collana","two":"Spilla","three":"Cammeo"},{"one":"Cintura","two":"Bretelle","three":"Giarrettiera"},{"one":"Calzino","two":"Guanto","three":"Ghetta"},{"one":"Giacca","two":"Impermeabile","three":"Poncho"},{"one":"Cravatta","two":"Papillon","three":"Plastron"},{"one":"Borsa","two":"Marsupio","three":"Bisaccia"},{"one":"Cestino","two":"Secchio","three":"Bigoncia"},{"one":"Scala","two":"Scala a pioli","three":"Trabattello"},{"one":"Carriola","two":"Pala","three":"Piccone"},{"one":"Zappa","two":"Vanga","three":"Forca"},{"one":"Tubo da giardino","two":"Irrigatore","three":"Nebulizzatore"},{"one":"Corda","two":"Catena","three":"Paranco"},{"one":"Chiodo","two":"Vite","three":"Rivetto"},{"one":"Dado","two":"Bullone","three":"Chiave dinamometrica"},{"one":"Sega","two":"Seghetto alternativo","three":"Sega a nastro"},{"one":"Livella","two":"Flessometro","three":"Micrometro"},{"one":"Scalpello","two":"Lima","three":"Raspa"},{"one":"Colla","two":"Nastro adesivo","three":"Mastice"},{"one":"Candeliere","two":"Lampadario","three":"Candelabro"},{"one":"Tappeto","two":"Zerbino","three":"Arazzo"},{"one":"Tenda da finestra","two":"Persiana","three":"Veneziana"},{"one":"Coperta","two":"Piumone","three":"Trapunta patchwork"},{"one":"Armadio","two":"Cassettiera","three":"Credenza"},{"one":"Divano","two":"Poltrona","three":"Chaise longue"},{"one":"Vaso","two":"Fioriera","three":"Anfora"},{"one":"Cornice","two":"Album fotografico","three":"Dagherrotipo"},{"one":"Sveglia","two":"Cronometro","three":"Orologio solare"},{"one":"Radio","two":"Lettore CD","three":"Fonografo"},{"one":"Cuffie","two":"Microfono","three":"Megafono"},{"one":"Chitarra","two":"Fisarmonica","three":"Theremin"},{"one":"Tamburo","two":"Xilofono","three":"Celesta"},{"one":"Pianoforte","two":"Clavicembalo","three":"Armonium"},{"one":"Flauto","two":"Clarinetto","three":"Fagotto"},{"one":"Tromba","two":"Trombone","three":"Corno francese"},{"one":"Violino","two":"Violoncello","three":"Contrabbasso"},{"one":"Scacchiera","two":"Dado da gioco","three":"Clessidra da torneo"},{"one":"Puzzle","two":"Yo-yo","three":"Tangram"},{"one":"Palloncino","two":"Aquilone","three":"Boomerang"},{"one":"Spugna","two":"Spazzola","three":"Cardatore"},{"one":"Pallina da tennis","two":"Boccia","three":"Disco da hockey"},{"one":"Busta","two":"Cartellina","three":"Portadocumenti"},{"one":"Cassa","two":"Baule","three":"Forziere"},{"one":"Tappo","two":"Imbuto","three":"Alambicco"}],"VIVENTI":[{"one":"Gatto","two":"Pinguino","three":"Ornitorinco"},{"one":"Cane","two":"Canguro","three":"Axolotl"},{"one":"Rosa","two":"Baobab","three":"Welwitschia"},{"one":"Farfalla","two":"Camaleonte","three":"Narvalo"},{"one":"Pesce rosso","two":"Polpo","three":"Nautilus"},{"one":"Elefante","two":"Formichiere","three":"Okapi"},{"one":"Girasole","two":"Bonsai","three":"Nepenthes"},{"one":"Gallina","two":"Pavone","three":"Casuario"},{"one":"Coniglio","two":"Istrice","three":"Pangolino"},{"one":"Delfino","two":"Tricheco","three":"Beluga"},{"one":"Ape","two":"Libellula","three":"Mantide religiosa"},{"one":"Rana","two":"Salamandra","three":"Proteo"},{"one":"Cavallo","two":"Lama","three":"Tapiro"},{"one":"Lumaca","two":"Stella marina","three":"Oloturia"},{"one":"Gufo","two":"Fenicottero","three":"Uccello lira"},{"one":"Quercia","two":"Sequoia","three":"Ginkgo"},{"one":"Coccinella","two":"Scarabeo","three":"Insetto stecco"},{"one":"Tartaruga","two":"Iguana","three":"Tuatara"},{"one":"Scoiattolo","two":"Castoro","three":"Capibara"},{"one":"Orso","two":"Ghiottone","three":"Binturong"},{"one":"Medusa","two":"Anemone di mare","three":"Sifonoforo"},{"one":"Granchio","two":"Aragosta","three":"Limulo"},{"one":"Riccio","two":"Talpa","three":"Echidna"},{"one":"Cactus","two":"Orchidea","three":"Rafflesia"},{"one":"Cigno","two":"Pellicano","three":"Becco a scarpa"},{"one":"Leone","two":"Ghepardo","three":"Serval"},{"one":"Tigre","two":"Leopardo","three":"Margay"},{"one":"Mucca","two":"Bufalo","three":"Banteng"},{"one":"Pecora","two":"Capra","three":"Stambecco"},{"one":"Maiale","two":"Cinghiale","three":"Babirussa"},{"one":"Asino","two":"Zebra","three":"Onagro"},{"one":"Giraffa","two":"Alce","three":"Saiga"},{"one":"Scimmia","two":"Gorilla","three":"Nasica"},{"one":"Topo","two":"Criceto","three":"Gerboa"},{"one":"Volpe","two":"Lupo","three":"Cuon"},{"one":"Foca","two":"Leone marino","three":"Dugongo"},{"one":"Balena","two":"Orca","three":"Balenottera boreale"},{"one":"Squalo","two":"Pesce spada","three":"Celacanto"},{"one":"Tonno","two":"Barracuda","three":"Pesce luna"},{"one":"Sardina","two":"Anguilla","three":"Lampreda"},{"one":"Cavalluccio marino","two":"Pesce palla","three":"Pesce napoleone"},{"one":"Gambero","two":"Paguro","three":"Canocchia"},{"one":"Cozza","two":"Ostrica","three":"Nautilo"},{"one":"Riccio di mare","two":"Corallo","three":"Crinoide"},{"one":"Serpente","two":"Cobra","three":"Mamba nero"},{"one":"Lucertola","two":"Geco","three":"Varano di Komodo"},{"one":"Coccodrillo","two":"Alligatore","three":"Gaviale"},{"one":"Tritone","two":"Rospo","three":"Olm"},{"one":"Aquila","two":"Falco","three":"Gipeto"},{"one":"Passero","two":"Rondine","three":"Gruccione"},{"one":"Piccione","two":"Tortora","three":"Hoatzin"},{"one":"Anatra","two":"Oca","three":"Edredone"},{"one":"Struzzo","two":"Emù","three":"Kiwi"},{"one":"Pappagallo","two":"Tucano","three":"Kakapo"},{"one":"Picchio","two":"Martin pescatore","three":"Bucero"},{"one":"Airone","two":"Cicogna","three":"Ibis eremita"},{"one":"Gabbiano","two":"Sterna","three":"Pulcinella di mare"},{"one":"Pettirosso","two":"Usignolo","three":"Beccofrusone"},{"one":"Corvo","two":"Gazza","three":"Nocciolaia"},{"one":"Mosca","two":"Zanzara","three":"Tipula"},{"one":"Vespa","two":"Calabrone","three":"Sfecide"},{"one":"Formica","two":"Termite","three":"Formicaleone"},{"one":"Grillo","two":"Cavalletta","three":"Grillotalpa"},{"one":"Cimice","two":"Afide","three":"Fulgora"},{"one":"Ragno","two":"Scorpione","three":"Solifugo"},{"one":"Millepiedi","two":"Centopiedi","three":"Peripato"},{"one":"Lombrico","two":"Sanguisuga","three":"Planaria"},{"one":"Chiocciola","two":"Limaccia","three":"Chitone"},{"one":"Margherita","two":"Papavero","three":"Stella alpina"},{"one":"Tulipano","two":"Iris","three":"Fritillaria"},{"one":"Lavanda","two":"Rosmarino","three":"Santolina"},{"one":"Pino","two":"Abete","three":"Araucaria"},{"one":"Palma","two":"Banano","three":"Cicade"},{"one":"Olivo","two":"Fico","three":"Carrubo"},{"one":"Melo","two":"Pero","three":"Cotogno"},{"one":"Ciliegio","two":"Pesco","three":"Nespolo"},{"one":"Vite","two":"Edera","three":"Glicine"},{"one":"Felce","two":"Muschio","three":"Licopodio"},{"one":"Ninfea","two":"Loto","three":"Victoria amazonica"},{"one":"Bambù","two":"Canna","three":"Papiro"},{"one":"Ortica","two":"Tarassaco","three":"Belladonna"},{"one":"Zucca","two":"Cetriolo","three":"Luffa"},{"one":"Pomodoro","two":"Melanzana","three":"Alchechengi"},{"one":"Carota","two":"Ravanello","three":"Pastinaca"},{"one":"Cipolla","two":"Aglio","three":"Scalogno"},{"one":"Fagiolo","two":"Pisello","three":"Lupino"},{"one":"Mais","two":"Grano","three":"Sorgo"},{"one":"Riso","two":"Orzo","three":"Segale"},{"one":"Champignon","two":"Porcino","three":"Mazza di tamburo"},{"one":"Amanita","two":"Finferlo","three":"Clathrus ruber"},{"one":"Muffa","two":"Lievito","three":"Penicillium"},{"one":"Lichene","two":"Tartufo","three":"Cordyceps"},{"one":"Alga","two":"Posidonia","three":"Sargassum"},{"one":"Spugna marina","two":"Idra","three":"Gorgonia"},{"one":"Ameba","two":"Paramecio","three":"Euglena"},{"one":"Dodo","two":"Mammut","three":"Tilacino"},{"one":"Diplodoco","two":"Triceratopo","three":"Deinocheirus"},{"one":"Tirannosauro","two":"Stegosauro","three":"Archaeopteryx"},{"one":"Panda","two":"Koala","three":"Quokka"},{"one":"Cervo","two":"Daino","three":"Mosco"}],"PERSONAGGI":[{"one":"Topolino","two":"Harry Potter","three":"Don Chisciotte"},{"one":"Superman","two":"Sherlock Holmes","three":"Raskolnikov"},{"one":"Pinocchio","two":"Indiana Jones","three":"Cyrano de Bergerac"},{"one":"Babbo Natale","two":"Darth Vader","three":"Capitan Nemo"},{"one":"Cenerentola","two":"Gandalf","three":"Dorian Gray"},{"one":"Batman","two":"Forrest Gump","three":"Jean Valjean"},{"one":"Spider-Man","two":"Rocky Balboa","three":"Ubu Re"},{"one":"Biancaneve","two":"Mary Poppins","three":"Mefistofele"},{"one":"Peter Pan","two":"James Bond","three":"Barone di Münchhausen"},{"one":"Asterix","two":"Zorro","three":"Gregor Samsa"},{"one":"Paperino","two":"Hannibal Lecter","three":"Orlando Furioso"},{"one":"Shrek","two":"Jack Sparrow","three":"Ulisse"},{"one":"Hulk","two":"Willy Wonka","three":"Amleto"},{"one":"Elsa","two":"Lara Croft","three":"Anna Karenina"},{"one":"Simba","two":"Neo","three":"Atticus Finch"},{"one":"Mago Merlino","two":"Rambo","three":"Jay Gatsby"},{"one":"Frankenstein","two":"Mr. Bean","three":"Gregor Mendel"},{"one":"Robin Hood","two":"Dracula","three":"Nikola Tesla"},{"one":"Napoleone","two":"Albert Einstein","three":"Socrate"},{"one":"Leonardo da Vinci","two":"Galileo Galilei","three":"Diogene"},{"one":"Giulio Cesare","two":"Marco Polo","three":"Spartaco"},{"one":"Cleopatra","two":"Giovanna d'Arco","three":"Ipazia"},{"one":"Cristoforo Colombo","two":"Mozart","three":"Caravaggio"},{"one":"Charlie Chaplin","two":"Freddie Mercury","three":"Salvador Dalí"},{"one":"Marilyn Monroe","two":"Alfred Hitchcock","three":"Franz Kafka"},{"one":"Mario","two":"Sonic","three":"Guybrush Threepwood"},{"one":"Luigi","two":"Crash Bandicoot","three":"Samus Aran"},{"one":"Pikachu","two":"Link","three":"Sephiroth"},{"one":"Homer Simpson","two":"Rick Sanchez","three":"BoJack Horseman"},{"one":"Bart Simpson","two":"Bender","three":"Fry"},{"one":"Snoopy","two":"Calvin","three":"Corto Maltese"},{"one":"Garfield","two":"Mafalda","three":"Krazy Kat"},{"one":"Winnie the Pooh","two":"Paddington","three":"Babar"},{"one":"Doraemon","two":"Heidi","three":"Capitan Harlock"},{"one":"Goku","two":"Naruto","three":"Kenshiro"},{"one":"Sailor Moon","two":"Lupin III","three":"Lady Oscar"},{"one":"Aladdin","two":"Mulan","three":"Kuzco"},{"one":"Ariel","two":"Rapunzel","three":"Esmeralda"},{"one":"Buzz Lightyear","two":"Saetta McQueen","three":"Wall-E"},{"one":"Woody","two":"Remy","three":"Miguel Rivera"},{"one":"Scooby-Doo","two":"Fred Flintstone","three":"George Jetson"},{"one":"Popeye","two":"Betty Boop","three":"Felix the Cat"},{"one":"Bugs Bunny","two":"Daffy Duck","three":"Wile E. Coyote"},{"one":"Tom e Jerry","two":"Titti e Silvestro","three":"Droopy"},{"one":"Wonder Woman","two":"Aquaman","three":"Doctor Strange"},{"one":"Iron Man","two":"Thor","three":"Deadpool"},{"one":"Capitan America","two":"Black Panther","three":"Wolverine"},{"one":"Joker","two":"Harley Quinn","three":"Rorschach"},{"one":"Frodo","two":"Aragorn","three":"Gollum"},{"one":"Bilbo Baggins","two":"Legolas","three":"Saruman"},{"one":"Hermione Granger","two":"Hagrid","three":"Luna Lovegood"},{"one":"Ron Weasley","two":"Severus Piton","three":"Bellatrix Lestrange"},{"one":"Luke Skywalker","two":"Yoda","three":"Boba Fett"},{"one":"Principessa Leia","two":"Obi-Wan Kenobi","three":"Jabba the Hutt"},{"one":"Marty McFly","two":"Doc Brown","three":"Biff Tannen"},{"one":"Terminator","two":"Robocop","three":"Snake Plissken"},{"one":"E.T.","two":"Edward mani di forbice","three":"Donnie Darko"},{"one":"Amélie","two":"Bridget Jones","three":"Annie Hall"},{"one":"Totò","two":"Fantozzi","three":"Il Marchese del Grillo"},{"one":"Bud Spencer","two":"Terence Hill","three":"Ugo Fantozzi"},{"one":"Roberto Benigni","two":"Massimo Troisi","three":"Alberto Sordi"},{"one":"Checco Zalone","two":"Paolo Villaggio","three":"Nino Manfredi"},{"one":"Raffaella Carrà","two":"Mina","three":"Domenico Modugno"},{"one":"Lucio Dalla","two":"Franco Battiato","three":"Fabrizio De André"},{"one":"Vasco Rossi","two":"Ligabue","three":"Pino Daniele"},{"one":"Jovanotti","two":"Tiziano Ferro","three":"Paolo Conte"},{"one":"Michael Jackson","two":"Elvis Presley","three":"David Bowie"},{"one":"Madonna","two":"Lady Gaga","three":"Bjork"},{"one":"Beatles","two":"Rolling Stones","three":"Pink Floyd"},{"one":"Cristiano Ronaldo","two":"Lionel Messi","three":"Diego Maradona"},{"one":"Valentino Rossi","two":"Michael Schumacher","three":"Ayrton Senna"},{"one":"Federica Pellegrini","two":"Usain Bolt","three":"Jesse Owens"},{"one":"Muhammad Ali","two":"Mike Tyson","three":"Rocky Marciano"},{"one":"Jannik Sinner","two":"Rafael Nadal","three":"Björn Borg"},{"one":"Garibaldi","two":"Mazzini","three":"Cavour"},{"one":"Dante Alighieri","two":"Petrarca","three":"Boccaccio"},{"one":"Manzoni","two":"Leopardi","three":"Pirandello"},{"one":"Shakespeare","two":"Molière","three":"Cervantes"},{"one":"Omero","two":"Virgilio","three":"Ovidio"},{"one":"Platone","two":"Aristotele","three":"Epicuro"},{"one":"Archimede","two":"Pitagora","three":"Euclide"},{"one":"Newton","two":"Darwin","three":"Faraday"},{"one":"Marie Curie","two":"Ada Lovelace","three":"Emmy Noether"},{"one":"Steve Jobs","two":"Bill Gates","three":"Alan Turing"},{"one":"Gandhi","two":"Martin Luther King","three":"Nelson Mandela"},{"one":"Winston Churchill","two":"Charles de Gaulle","three":"Otto von Bismarck"},{"one":"Marco Aurelio","two":"Nerone","three":"Caligola"},{"one":"Tutankhamon","two":"Ramses II","three":"Akhenaton"},{"one":"Alessandro Magno","two":"Annibale","three":"Scipione l'Africano"},{"one":"Luigi XIV","two":"Enrico VIII","three":"Riccardo III"},{"one":"Elisabetta II","two":"Vittoria","three":"Maria Teresa d'Austria"},{"one":"Van Gogh","two":"Picasso","three":"Kandinsky"},{"one":"Michelangelo","two":"Raffaello","three":"Brunelleschi"},{"one":"Beethoven","two":"Chopin","three":"Stravinskij"},{"one":"Verdi","two":"Puccini","three":"Rossini"},{"one":"Freud","two":"Jung","three":"Pavlov"},{"one":"Pippi Calzelunghe","two":"Capitan Uncino","three":"Cosimo Piovasco di Rondò"},{"one":"Dora l'esploratrice","two":"Sandokan","three":"Mastro Geppetto"},{"one":"Mr. Monopoly","two":"Zio Paperone","three":"Arsenio Lupin"},{"one":"Rita Levi-Montalcini","two":"Margherita Hack","three":"Lise Meitner"}],"LUOGHI":[{"one":"Parigi","two":"Machu Picchu","three":"Petra"},{"one":"Roma","two":"Stonehenge","three":"Angkor Wat"},{"one":"Londra","two":"Monte Fuji","three":"Timbuctù"},{"one":"New York","two":"Isola di Pasqua","three":"Samarcanda"},{"one":"Venezia","two":"Grand Canyon","three":"Cappadocia"},{"one":"Pisa","two":"Cascate del Niagara","three":"Salar de Uyuni"},{"one":"Napoli","two":"Monte Everest","three":"Deserto di Atacama"},{"one":"Torino","two":"Pompei","three":"Lago Baikal"},{"one":"Milano","two":"Cremlino","three":"Uluru"},{"one":"Firenze","two":"Acropoli di Atene","three":"Göbekli Tepe"},{"one":"Sahara","two":"Mar Morto","three":"Terra del Fuoco"},{"one":"Polo Nord","two":"Galápagos","three":"Patagonia"},{"one":"Amazzonia","two":"Yellowstone","three":"Borneo"},{"one":"Hawaii","two":"Santorini","three":"Socotra"},{"one":"Disneyland","two":"Area 51","three":"Monte Rushmore"},{"one":"Colosseo","two":"Alhambra","three":"Borobudur"},{"one":"Torre Eiffel","two":"Sagrada Família","three":"Hagia Sophia"},{"one":"Taj Mahal","two":"Chichén Itzá","three":"Lalibela"},{"one":"Grande Muraglia","two":"Versailles","three":"Città Proibita"},{"one":"Piramidi di Giza","two":"Valle dei Re","three":"Abu Simbel"},{"one":"Atlantide","two":"Narnia","three":"Mordor"},{"one":"Hogwarts","two":"Paese delle Meraviglie","three":"Isola che non c'è"},{"one":"Gotham City","two":"Jurassic Park","three":"Metropolis"},{"one":"Monte Olimpo","two":"Inferno di Dante","three":"Camelot"},{"one":"Luna","two":"Marte","three":"Stazione Spaziale Internazionale"},{"one":"Barcellona","two":"Gaudí Park Güell","three":"Montserrat"},{"one":"Berlino","two":"Porta di Brandeburgo","three":"Isola dei Musei"},{"one":"Madrid","two":"Museo del Prado","three":"Escorial"},{"one":"Lisbona","two":"Torre di Belém","three":"Sintra"},{"one":"Amsterdam","two":"Canali di Amsterdam","three":"Kinderdijk"},{"one":"Vienna","two":"Schönbrunn","three":"Wachau"},{"one":"Praga","two":"Ponte Carlo","three":"Ossario di Sedlec"},{"one":"Budapest","two":"Parlamento ungherese","three":"Hortobágy"},{"one":"Dublino","two":"Scogliere di Moher","three":"Newgrange"},{"one":"Edimburgo","two":"Loch Ness","three":"Skara Brae"},{"one":"Copenaghen","two":"Tivoli","three":"Roskilde"},{"one":"Stoccolma","two":"Museo Vasa","three":"Kiruna"},{"one":"Oslo","two":"Fiordi norvegesi","three":"Svalbard"},{"one":"Helsinki","two":"Lapponia","three":"Arcipelago delle Åland"},{"one":"Mosca","two":"Piazza Rossa","three":"Lago Ladoga"},{"one":"Istanbul","two":"Moschea Blu","three":"Cappadocia sotterranea"},{"one":"Gerusalemme","two":"Muro del Pianto","three":"Masada"},{"one":"Dubai","two":"Burj Khalifa","three":"Rub' al-Khali"},{"one":"Il Cairo","two":"Sfinge di Giza","three":"Oasi di Siwa"},{"one":"Marrakech","two":"Piazza Jemaa el-Fna","three":"Aït-Ben-Haddou"},{"one":"Città del Capo","two":"Table Mountain","three":"Drakensberg"},{"one":"Nairobi","two":"Serengeti","three":"Cratere di Ngorongoro"},{"one":"Tokyo","two":"Shibuya","three":"Nikkō"},{"one":"Kyoto","two":"Fushimi Inari","three":"Nara"},{"one":"Pechino","two":"Tempio del Cielo","three":"Grotte di Longmen"},{"one":"Shanghai","two":"Bund","three":"Zhangjiajie"},{"one":"Hong Kong","two":"Victoria Peak","three":"Macao"},{"one":"Bangkok","two":"Palazzo Reale","three":"Ayutthaya"},{"one":"Singapore","two":"Marina Bay","three":"Gardens by the Bay"},{"one":"Delhi","two":"Forte Rosso","three":"Varanasi"},{"one":"Mumbai","two":"Porta dell'India","three":"Grotte di Ellora"},{"one":"Sydney","two":"Opera House","three":"Uluru-Kata Tjuta"},{"one":"Melbourne","two":"Great Ocean Road","three":"Tasmania"},{"one":"Auckland","two":"Milford Sound","three":"Rotorua"},{"one":"Los Angeles","two":"Hollywood","three":"Death Valley"},{"one":"San Francisco","two":"Golden Gate","three":"Yosemite"},{"one":"Las Vegas","two":"Strip","three":"Monument Valley"},{"one":"Washington","two":"Casa Bianca","three":"Smithsonian"},{"one":"Chicago","two":"Willis Tower","three":"Route 66"},{"one":"Miami","two":"South Beach","three":"Everglades"},{"one":"Boston","two":"Harvard","three":"Cape Cod"},{"one":"Toronto","two":"CN Tower","three":"Cascate del Niagara lato canadese"},{"one":"Vancouver","two":"Stanley Park","three":"Banff"},{"one":"Città del Messico","two":"Teotihuacan","three":"Palenque"},{"one":"L'Avana","two":"Malecón","three":"Valle de Viñales"},{"one":"Rio de Janeiro","two":"Cristo Redentore","three":"Lençóis Maranhenses"},{"one":"Buenos Aires","two":"Obelisco","three":"Perito Moreno"},{"one":"Bogotà","two":"Cartagena","three":"Caño Cristales"},{"one":"Reykjavík","two":"Laguna Blu","three":"Vatnajökull"},{"one":"Bruxelles","two":"Atomium","three":"Bruges"},{"one":"Monaco di Baviera","two":"Castello di Neuschwanstein","three":"Foresta Nera"},{"one":"Zurigo","two":"Cervino","three":"Jungfrau"},{"one":"Atene","two":"Partenone","three":"Meteore"},{"one":"Dubrovnik","two":"Laghi di Plitvice","three":"Mostar"},{"one":"Belgrado","two":"Fortezza di Kalemegdan","three":"Monastero di Studenica"},{"one":"Bucarest","two":"Castello di Bran","three":"Delta del Danubio"},{"one":"Cracovia","two":"Auschwitz","three":"Miniera di sale di Wieliczka"},{"one":"Varsavia","two":"Palazzo della Cultura","three":"Foresta di Białowieża"},{"one":"Tallinn","two":"Riga","three":"Collina delle Croci"},{"one":"Genova","two":"Acquario di Genova","three":"Cinque Terre"},{"one":"Bologna","two":"Due Torri","three":"San Luca"},{"one":"Verona","two":"Arena di Verona","three":"Lago di Garda"},{"one":"Palermo","two":"Teatro Massimo","three":"Valle dei Templi"},{"one":"Cagliari","two":"Nuraghe di Barumini","three":"Gola di Gorropu"},{"one":"Matera","two":"Sassi di Matera","three":"Castel del Monte"},{"one":"Siena","two":"Piazza del Campo","three":"Val d'Orcia"},{"one":"Assisi","two":"Basilica di San Francesco","three":"Civita di Bagnoregio"},{"one":"Ravenna","two":"Mosaici di Ravenna","three":"San Marino"},{"one":"Trieste","two":"Piazza Unità d'Italia","three":"Grotte di Postumia"},{"one":"Lecce","two":"Alberobello","three":"Castelmezzano"},{"one":"Marsiglia","two":"Mont Saint-Michel","three":"Carcassonne"},{"one":"Porto","two":"Valle del Douro","three":"Coimbra"},{"one":"Siviglia","two":"Alhambra di Granada","three":"Ronda"},{"one":"Lucerna","two":"Cascate del Reno","three":"Lauterbrunnen"},{"one":"Salisburgo","two":"Hallstatt","three":"Grotte di ghiaccio di Eisriesenwelt"}],"TITOLI DI FILM":[{"one":"Titanic","two":"Il gladiatore","three":"Stalker"},{"one":"Il re leone","two":"Pulp Fiction","three":"Rashomon"},{"one":"Frozen","two":"Inception","three":"Solaris"},{"one":"Toy Story","two":"Fight Club","three":"Persona"},{"one":"Jumanji","two":"Interstellar","three":"Metropolis"},{"one":"Ghostbusters","two":"Il silenzio degli innocenti","three":"M - Il mostro di Düsseldorf"},{"one":"Rocky","two":"Apocalypse Now","three":"8½"},{"one":"Grease","two":"Shining","three":"La corazzata Potëmkin"},{"one":"E.T.","two":"Blade Runner","three":"Il settimo sigillo"},{"one":"Avatar","two":"Arancia meccanica","three":"L'avventura"},{"one":"Jurassic Park","two":"The Truman Show","three":"I 400 colpi"},{"one":"Mamma Mia!","two":"Il grande Lebowski","three":"Mulholland Drive"},{"one":"Pretty Woman","two":"Taxi Driver","three":"Fitzcarraldo"},{"one":"Home Alone","two":"Full Metal Jacket","three":"La dolce vita"},{"one":"Indiana Jones","two":"American Beauty","three":"I sette samurai"},{"one":"Ritorno al futuro","two":"V per Vendetta","three":"La jetée"},{"one":"Harry Potter","two":"The Prestige","three":"Dogville"},{"one":"Spider-Man","two":"Donnie Darko","three":"Nosferatu"},{"one":"Star Wars","two":"Il favoloso mondo di Amélie","three":"Aguirre, furore di Dio"},{"one":"Il padrino","two":"C'era una volta in America","three":"Andrej Rublëv"},{"one":"La vita è bella","two":"Trainspotting","three":"L'angelo sterminatore"},{"one":"Forrest Gump","two":"Oldboy","three":"Il posto delle fragole"},{"one":"Matrix","two":"Brazil","three":"La notte"},{"one":"Lo squalo","two":"Memento","three":"L'uomo con la macchina da presa"},{"one":"Up","two":"Her","three":"Il gabinetto del dottor Caligari"},{"one":"Il libro della giungla","two":"The Social Network","three":"L'anno scorso a Marienbad"},{"one":"La sirenetta","two":"Whiplash","three":"Lo specchio"},{"one":"Aladdin","two":"Gran Torino","three":"Il conformista"},{"one":"La bella e la bestia","two":"Million Dollar Baby","three":"L'Atalante"},{"one":"Cenerentola","two":"Il petroliere","three":"Il disprezzo"},{"one":"Biancaneve e i sette nani","two":"Birdman","three":"Pickpocket"},{"one":"La carica dei 101","two":"La grande bellezza","three":"Ordet"},{"one":"Alla ricerca di Nemo","two":"Drive","three":"Sansho Dayu"},{"one":"Ratatouille","two":"Moonlight","three":"Au hasard Balthazar"},{"one":"Gli incredibili","two":"The Wrestler","three":"La maman et la putain"},{"one":"Shrek 2","two":"Lost in Translation","three":"Satantango"},{"one":"Madagascar","two":"Manchester by the Sea","three":"Jeanne Dielman"},{"one":"Kung Fu Panda","two":"The Lobster","three":"Werckmeister Harmonies"},{"one":"Cars","two":"Roma","three":"Close-Up"},{"one":"Inside Out","two":"The Florida Project","three":"Taste of Cherry"},{"one":"Coco","two":"The Lighthouse","three":"Certified Copy"},{"one":"Encanto","two":"Sound of Metal","three":"Uncle Boonmee che ricorda le vite precedenti"},{"one":"Oceania","two":"The Banshees of Inisherin","three":"L'uomo senza passato"},{"one":"Wonka","two":"Past Lives","three":"Il cavallo di Torino"},{"one":"Barbie","two":"Anatomia di una caduta","three":"Memorie del sottosviluppo"},{"one":"Oppenheimer","two":"La zona d'interesse","three":"Il colore del melograno"},{"one":"Top Gun","two":"Collateral","three":"Il lungo addio"},{"one":"Top Gun: Maverick","two":"Heat - La sfida","three":"F come falso"},{"one":"Mission: Impossible","two":"Sicario","three":"La morte corre sul fiume"},{"one":"Fast & Furious","two":"Prisoners","three":"Il salario della paura"},{"one":"John Wick","two":"Nightcrawler","three":"Il mucchio selvaggio"},{"one":"Die Hard","two":"L.A. Confidential","three":"Vite vendute"},{"one":"Terminator 2","two":"RoboCop","three":"Videodrome"},{"one":"Alien","two":"The Thing","three":"Possession"},{"one":"Aliens","two":"Gattaca","three":"Seconds"},{"one":"Predator","two":"District 9","three":"Phase IV"},{"one":"Independence Day","two":"Moon","three":"Primer"},{"one":"Men in Black","two":"Ex Machina","three":"Upstream Color"},{"one":"The Avengers","two":"Watchmen","three":"The Congress"},{"one":"Iron Man","two":"Logan","three":"Super"},{"one":"Black Panther","two":"Unbreakable","three":"Chronicle"},{"one":"Deadpool","two":"Kick-Ass","three":"Mystery Men"},{"one":"Guardiani della Galassia","two":"Scott Pilgrim vs. the World","three":"Darkman"},{"one":"Doctor Strange","two":"Everything Everywhere All at Once","three":"The Man from Earth"},{"one":"Wonder Woman","two":"V for Vendetta","three":"Coherence"},{"one":"Aquaman","two":"Sin City","three":"A Scanner Darkly"},{"one":"Joker","two":"The Machinist","three":"Pi greco - Il teorema del delirio"},{"one":"The Batman","two":"Zodiac","three":"Cure"},{"one":"Seven","two":"Memories of Murder","three":"I diabolici"},{"one":"Il sesto senso","two":"The Others","three":"Carnival of Souls"},{"one":"The Ring","two":"Babadook","three":"Kwaidan"},{"one":"Scream","two":"It Follows","three":"Onibaba"},{"one":"Halloween","two":"The Witch","three":"Kuroneko"},{"one":"Nightmare","two":"Hereditary","three":"Eyes Without a Face"},{"one":"Saw","two":"Midsommar","three":"Tetsuo: The Iron Man"},{"one":"La casa","two":"Suspiria","three":"Inferno"},{"one":"L'esorcista","two":"The Wailing","three":"La maschera del demonio"},{"one":"Ghost","two":"A Ghost Story","three":"Ugetsu"},{"one":"Dirty Dancing","two":"Before Sunrise","three":"Brief Encounter"},{"one":"Notting Hill","two":"Eternal Sunshine of the Spotless Mind","three":"Hiroshima mon amour"},{"one":"Love Actually","two":"Blue Valentine","three":"In the Mood for Love"},{"one":"Il diario di Bridget Jones","two":"Carol","three":"Chungking Express"},{"one":"Quattro matrimoni e un funerale","two":"The Worst Person in the World","three":"A Woman Under the Influence"},{"one":"Mrs. Doubtfire","two":"Little Miss Sunshine","three":"Harold and Maude"},{"one":"Una notte al museo","two":"The Royal Tenenbaums","three":"PlayTime"},{"one":"The Mask","two":"Being John Malkovich","three":"Holy Motors"},{"one":"Ace Ventura","two":"Adaptation","three":"Synecdoche, New York"},{"one":"Scary Movie","two":"What We Do in the Shadows","three":"Man Bites Dog"},{"one":"Una poltrona per due","two":"Fargo","three":"The Player"},{"one":"Il principe cerca moglie","two":"Burn After Reading","three":"Nashville"},{"one":"Tre uomini e una gamba","two":"Pane e tulipani","three":"I vitelloni"},{"one":"Benvenuti al Sud","two":"Perfetti sconosciuti","three":"Una giornata particolare"},{"one":"Quo vado?","two":"Dogman","three":"Le conseguenze dell'amore"},{"one":"Il ciclone","two":"Mediterraneo","three":"Indagine su un cittadino al di sopra di ogni sospetto"},{"one":"Nuovo Cinema Paradiso","two":"La meglio gioventù","three":"Il sorpasso"},{"one":"Non ci resta che piangere","two":"Habemus Papam","three":"La grande guerra"},{"one":"Johnny Stecchino","two":"Le fate ignoranti","three":"La notte di San Lorenzo"},{"one":"Chiedimi se sono felice","two":"Gomorra","three":"Il posto"},{"one":"La famiglia Addams","two":"Il nastro bianco","three":"La strada"},{"one":"Il Grinch","two":"Triangle of Sadness","three":"L'eclisse"}],"TITOLI DI CANZONI":[{"one":"Volare","two":"Imagine","three":"The Sound of Silence"},{"one":"Azzurro","two":"Smells Like Teen Spirit","three":"A Whiter Shade of Pale"},{"one":"Nel blu dipinto di blu","two":"Hotel California","three":"Space Oddity"},{"one":"We Will Rock You","two":"Wonderwall","three":"Paranoid Android"},{"one":"Happy","two":"Nothing Else Matters","three":"The End"},{"one":"Viva la vida","two":"Another Brick in the Wall","three":"Life on Mars?"},{"one":"Thriller","two":"Enjoy the Silence","three":"Heroes"},{"one":"Despacito","two":"Losing My Religion","three":"A Day in the Life"},{"one":"Bella ciao","two":"Wish You Were Here","three":"Baba O'Riley"},{"one":"YMCA","two":"Knockin' on Heaven's Door","three":"Suzanne"},{"one":"La canzone del sole","two":"Bohemian Rhapsody","three":"Hallelujah"},{"one":"Sarà perché ti amo","two":"Every Breath You Take","three":"The Boxer"},{"one":"50 Special","two":"Stairway to Heaven","three":"Karma Police"},{"one":"Gloria","two":"Sweet Child o' Mine","three":"The Passenger"},{"one":"Con te partirò","two":"Take on Me","three":"Running Up That Hill"},{"one":"L'italiano","two":"Come As You Are","three":"The Logical Song"},{"one":"Albachiara","two":"Purple Rain","three":"The House of the Rising Sun"},{"one":"Una vita in vacanza","two":"Paint It Black","three":"Riders on the Storm"},{"one":"Vita spericolata","two":"Creep","three":"Redemption Song"},{"one":"Il cielo in una stanza","two":"With or Without You","three":"The Man Who Sold the World"},{"one":"Felicità","two":"Under Pressure","three":"Both Sides Now"},{"one":"Centro di gravità permanente","two":"Radio Ga Ga","three":"Waterloo Sunset"},{"one":"La donna cannone","two":"Sultans of Swing","three":"God Only Knows"},{"one":"Caruso","two":"Personal Jesus","three":"Norwegian Wood"},{"one":"Gianna","two":"Comfortably Numb","three":"The Killing Moon"},{"one":"Occidentali's Karma","two":"Chandelier","three":"Teardrop"},{"one":"Soldi","two":"Take Me to Church","three":"Roads"},{"one":"Brividi","two":"Somebody That I Used to Know","three":"Glory Box"},{"one":"Due vite","two":"Royals","three":"Hyperballad"},{"one":"Fai rumore","two":"Bad Guy","three":"Bachelorette"},{"one":"Grande amore","two":"Someone Like You","three":"Jóga"},{"one":"La solitudine","two":"Back to Black","three":"Svefn-g-englar"},{"one":"Laura non c'è","two":"Rehab","three":"All Is Full of Love"},{"one":"Se bastasse una canzone","two":"Fix You","three":"Street Spirit"},{"one":"Più bella cosa","two":"Clocks","three":"Fake Plastic Trees"},{"one":"Un'emozione per sempre","two":"The Scientist","three":"No Surprises"},{"one":"Come saprei","two":"Don't Look Back in Anger","three":"Exit Music (For a Film)"},{"one":"Di sole e d'azzurro","two":"Champagne Supernova","three":"There Is a Light That Never Goes Out"},{"one":"Luce (tramonti a nord est)","two":"Zombie","three":"How Soon Is Now?"},{"one":"La notte","two":"Dreams","three":"Love Will Tear Us Apart"},{"one":"Non me lo so spiegare","two":"Everybody Hurts","three":"Atmosphere"},{"one":"Senza una donna","two":"Shallow","three":"Ceremony"},{"one":"Ti amo","two":"Iris","three":"The Rip"},{"one":"T'appartengo","two":"Torn","three":"Lorelei"},{"one":"Sincerità","two":"What's Up?","three":"Into My Arms"},{"one":"Salirò","two":"Use Somebody","three":"The Mercy Seat"},{"one":"Parole parole","two":"Hurt","three":"The Ship Song"},{"one":"Acqua e sale","two":"The Pretender","three":"Monkey Gone to Heaven"},{"one":"Senza parole","two":"Everlong","three":"Debaser"},{"one":"Urlando contro il cielo","two":"Basket Case","three":"Where Is My Mind?"},{"one":"Rewind","two":"American Idiot","three":"Gigantic"},{"one":"Gli spari sopra","two":"Seven Nation Army","three":"Teen Age Riot"},{"one":"Certe notti","two":"Mr. Brightside","three":"Only Shallow"},{"one":"Piccola stella senza cielo","two":"Sex on Fire","three":"When You Sleep"},{"one":"Ho messo via","two":"Do I Wanna Know?","three":"Obstacle 1"},{"one":"Hanno ucciso l'Uomo Ragno","two":"Uprising","three":"Reptilia"},{"one":"Sei un mito","two":"Boulevard of Broken Dreams","three":"Maps"},{"one":"Nord sud ovest est","two":"Numb","three":"Helicopter"},{"one":"La regola dell'amico","two":"In the End","three":"Take Me Out"},{"one":"Una canzone d'amore","two":"Bring Me to Life","three":"Banquet"},{"one":"Rotta per casa di Dio","two":"My Immortal","three":"Munich"},{"one":"Perdere l'amore","two":"Californication","three":"PDA"},{"one":"Ti lascerò","two":"Otherside","three":"Such Great Heights"},{"one":"Gente di mare","two":"Scar Tissue","three":"New Slang"},{"one":"Si può dare di più","two":"Under the Bridge","three":"First Day of My Life"},{"one":"Un'estate italiana","two":"Linger","three":"Lua"},{"one":"Notti magiche","two":"Friday I'm in Love","three":"Holocene"},{"one":"Vivo per lei","two":"Boys Don't Cry","three":"Blood Bank"},{"one":"Gli uomini non cambiano","two":"Just Like Heaven","three":"Your Best American Girl"},{"one":"Almeno tu nell'universo","two":"Pictures of You","three":"The District Sleeps Alone Tonight"},{"one":"E penso a te","two":"Policy of Truth","three":"My Girls"},{"one":"Emozioni","two":"Blue Monday","three":"Wake Up"},{"one":"Il mio canto libero","two":"Bizarre Love Triangle","three":"Neighborhood #1 (Tunnels)"},{"one":"Ancora tu","two":"True Faith","three":"Ready, Able"},{"one":"Io vorrei... non vorrei... ma se vuoi","two":"Smalltown Boy","three":"Two Weeks"},{"one":"Generale","two":"Don't You Want Me","three":"Myth"},{"one":"Rimmel","two":"Tainted Love","three":"Space Song"},{"one":"La leva calcistica della classe '68","two":"Fade to Grey","three":"Archie, Marry Me"},{"one":"Viva l'Italia","two":"Sweet Dreams (Are Made of This)","three":"Motion Sickness"},{"one":"Quattro marzo 1943","two":"Everybody Wants to Rule the World","three":"Kyoto"},{"one":"Futura","two":"Mad World","three":"Garden Song"},{"one":"Anna e Marco","two":"Don't Dream It's Over","three":"Seventeen"},{"one":"L'anno che verrà","two":"Take My Breath Away","three":"Shark Smile"},{"one":"Piazza Grande","two":"Fast Car","three":"Not"},{"one":"La cura","two":"Everybody's Got to Learn Sometime","three":"Simulation Swarm"},{"one":"Voglio vederti danzare","two":"Golden Brown","three":"Velvet Ring"},{"one":"Bandiera bianca","two":"This Charming Man","three":"Masterpiece"},{"one":"Cuccurucucù","two":"West End Girls","three":"Mythological Beauty"},{"one":"La stagione dell'amore","two":"Vienna","three":"Mary"},{"one":"La guerra di Piero","two":"Vincent","three":"Paul"},{"one":"Bocca di Rosa","two":"Father and Son","three":"Casimir Pulaski Day"},{"one":"Il pescatore","two":"Perfect Day","three":"Fourth of July"},{"one":"Creuza de mä","two":"Walk on the Wild Side","three":"Futile Devices"},{"one":"A te","two":"Pale Blue Eyes","three":"Mystery of Love"},{"one":"Penso positivo","two":"Venus in Furs","three":"Chicago"},{"one":"Vita","two":"Purple Haze","three":"Marquee Moon"},{"one":"Vamos a la playa","two":"Every Little Thing She Does Is Magic","three":"Once in a Lifetime"},{"one":"Se telefonando","two":"Wuthering Heights","three":"The Great Gig in the Sky"},{"one":"Una musica può fare","two":"Message in a Bottle","three":"The Less I Know the Better"},{"one":"Senza fine","two":"Everywhere","three":"Lazarus"}],"PROVERBI E MODI DI DIRE":[{"one":"Chi dorme non piglia pesci","two":"Avere le mani bucate","three":"Menare il can per l'aia"},{"one":"Meglio tardi che mai","two":"Avere la testa tra le nuvole","three":"Prendere lucciole per lanterne"},{"one":"Ride bene chi ride ultimo","two":"Essere al settimo cielo","three":"Fare orecchie da mercante"},{"one":"L'unione fa la forza","two":"Essere in gamba","three":"Avere un diavolo per capello"},{"one":"Il tempo è denaro","two":"Essere un pesce fuor d'acqua","three":"Cercare il pelo nell'uovo"},{"one":"Tale padre tale figlio","two":"Avere l'acqua alla gola","three":"Mettere il carro davanti ai buoi"},{"one":"Chi trova un amico trova un tesoro","two":"Prendere due piccioni con una fava","three":"Avere la coda di paglia"},{"one":"Tra il dire e il fare c'è di mezzo il mare","two":"Essere con le spalle al muro","three":"Cadere dalla padella nella brace"},{"one":"Paese che vai usanza che trovi","two":"Non vedere l'ora","three":"Arrampicarsi sugli specchi"},{"one":"L'abito non fa il monaco","two":"Avere la botte piena e la moglie ubriaca","three":"Fare di tutta l'erba un fascio"},{"one":"Il mattino ha l'oro in bocca","two":"Avere il coltello dalla parte del manico","three":"Avere voce in capitolo"},{"one":"Chi va piano va sano e va lontano","two":"Gettare la spugna","three":"Essere alla frutta"},{"one":"Non è tutto oro quel che luccica","two":"Mettere i bastoni tra le ruote","three":"Non sapere che pesci prendere"},{"one":"A caval donato non si guarda in bocca","two":"Tirare acqua al proprio mulino","three":"Avere grilli per la testa"},{"one":"Una rondine non fa primavera","two":"Essere come il prezzemolo","three":"Fare il passo più lungo della gamba"},{"one":"Il lupo perde il pelo ma non il vizio","two":"Prendere la palla al balzo","three":"Dormire sugli allori"},{"one":"Rosso di sera bel tempo si spera","two":"Avere la luna storta","three":"Essere al verde"},{"one":"Chi semina vento raccoglie tempesta","two":"Fare buon viso a cattivo gioco","three":"Piangere sul latte versato"},{"one":"Non tutte le ciambelle riescono col buco","two":"Mettere una pulce nell'orecchio","three":"Essere tra l'incudine e il martello"},{"one":"Finché c'è vita c'è speranza","two":"Rompere il ghiaccio","three":"Saltare di palo in frasca"},{"one":"Occhio non vede cuore non duole","two":"Avere la memoria di un elefante","three":"Scoprire l'acqua calda"},{"one":"Mal comune mezzo gaudio","two":"Fare castelli in aria","three":"Vendere la pelle dell'orso prima di averlo catturato"},{"one":"Chi troppo vuole nulla stringe","two":"Togliersi un sassolino dalla scarpa","three":"Fare i conti senza l'oste"},{"one":"Chi fa da sé fa per tre","two":"Avere il dente avvelenato","three":"Portare acqua con le orecchie"},{"one":"Non c'è rosa senza spine","two":"Mettere il dito nella piaga","three":"Raddrizzare le gambe ai cani"},{"one":"Chi la dura la vince","two":"Avere un cuore d'oro","three":"Essere una mosca bianca"},{"one":"Volere è potere","two":"Essere nero dalla rabbia","three":"Avere le mani legate"},{"one":"Il buon giorno si vede dal mattino","two":"Avere sangue freddo","three":"Essere l'ultima ruota del carro"},{"one":"Chi non risica non rosica","two":"Essere un libro aperto","three":"Fare il diavolo a quattro"},{"one":"Meglio soli che male accompagnati","two":"Avere la pelle d'oca","three":"Avere il prosciutto sugli occhi"},{"one":"L'appetito vien mangiando","two":"Essere una lumaca","three":"Avere sale in zucca"},{"one":"Chi vivrà vedrà","two":"Essere testardo come un mulo","three":"Fare una tempesta in un bicchier d'acqua"},{"one":"Can che abbaia non morde","two":"Avere la testa dura","three":"Mettere il sale sulla coda"},{"one":"Il gioco non vale la candela","two":"Essere una volpe","three":"Dare un colpo al cerchio e uno alla botte"},{"one":"Chi si loda s'imbroda","two":"Essere un coniglio","three":"Avere un piede in due scarpe"},{"one":"La gatta frettolosa fece i gattini ciechi","two":"Essere una pecora nera","three":"Fare la parte del leone"},{"one":"Sbagliando s'impara","two":"Essere una cima","three":"Fare il pesce in barile"},{"one":"Impara l'arte e mettila da parte","two":"Essere alla mano","three":"Restare con un pugno di mosche"},{"one":"Ogni lasciata è persa","two":"Avere le braccia corte","three":"Rimanere a bocca asciutta"},{"one":"Chi ben comincia è a metà dell'opera","two":"Avere la bocca cucita","three":"Restare di stucco"},{"one":"Chi tace acconsente","two":"Vedere tutto nero","three":"Tenere il piede in due staffe"},{"one":"La speranza è l'ultima a morire","two":"Avere gli occhi più grandi della pancia","three":"Tirare il sasso e nascondere la mano"},{"one":"Chi rompe paga","two":"Essere cotto a puntino","three":"Mettere troppa carne al fuoco"},{"one":"Morto un papa se ne fa un altro","two":"Dare carta bianca","three":"Togliere le castagne dal fuoco"},{"one":"Ogni promessa è debito","two":"Mettere nero su bianco","three":"Tenere il coltello dalla parte del manico"},{"one":"Patti chiari amicizia lunga","two":"Parlare a vanvera","three":"Fare tabula rasa"},{"one":"A buon intenditor poche parole","two":"Dire pane al pane e vino al vino","three":"Menare il torrone"},{"one":"Le bugie hanno le gambe corte","two":"Mordersi la lingua","three":"Prendere fischi per fiaschi"},{"one":"Chi è causa del suo mal pianga se stesso","two":"Fare quattro chiacchiere","three":"Avere la lingua lunga"},{"one":"Non c'è due senza tre","two":"Fare due passi","three":"Essere quattro gatti"},{"one":"Tre è il numero perfetto","two":"Metterci una pietra sopra","three":"Fare trenta e trentuno"},{"one":"Tutto è bene quel che finisce bene","two":"Stringere i denti","three":"Chiudere baracca e burattini"},{"one":"A mali estremi estremi rimedi","two":"Mettere le mani avanti","three":"Rompere gli indugi"},{"one":"Prevenire è meglio che curare","two":"Guardare nel piatto degli altri","three":"Fasciarsi la testa prima di rompersela"},{"one":"L'erba del vicino è sempre più verde","two":"Seguire la corrente","three":"Fare le scarpe a qualcuno"},{"one":"Chi va con lo zoppo impara a zoppicare","two":"Essere culo e camicia","three":"Andare controcorrente"},{"one":"Dimmi con chi vai e ti dirò chi sei","two":"Essere tutto suo padre","three":"Fare comunella"},{"one":"La mela non cade lontano dall'albero","two":"Lavare i panni sporchi in famiglia","three":"Buon sangue non mente"},{"one":"Tra moglie e marito non mettere il dito","two":"Avere un sassolino nella scarpa","three":"Mettere zizzania"},{"one":"Parenti serpenti","two":"Perdere di vista qualcuno","three":"Togliersi un peso dallo stomaco"},{"one":"Lontano dagli occhi lontano dal cuore","two":"Perdere la testa per qualcuno","three":"Avere qualcuno nel cuore"},{"one":"Al cuor non si comanda","two":"Volere un bene dell'anima","three":"Avere le farfalle nello stomaco"},{"one":"Chi ama me ama il mio cane","two":"Avere un debole per qualcuno","three":"Portare qualcuno in palmo di mano"},{"one":"Il primo amore non si scorda mai","two":"Essere uno schianto","three":"Fare gli occhi dolci"},{"one":"Non è bello ciò che è bello ma è bello ciò che piace","two":"Andare a genio","three":"Essere un tipo"},{"one":"De gustibus non disputandum est","two":"Avere l'acquolina in bocca","three":"Non essere nelle proprie corde"},{"one":"A tavola non si invecchia","two":"Essere sano come un pesce","three":"Mangiare come un lupo"},{"one":"Una mela al giorno toglie il medico di torno","two":"Essere in forma","three":"Avere una salute di ferro"},{"one":"Mens sana in corpore sano","two":"Dormire come un ghiro","three":"Avere il fiato sul collo"},{"one":"La notte porta consiglio","two":"Accontentarsi di poco","three":"Passare una notte in bianco"},{"one":"Meglio un uovo oggi che una gallina domani","two":"Avere molta esperienza","three":"Volere la luna"},{"one":"Gallina vecchia fa buon brodo","two":"Rimboccarsi le maniche","three":"Sapere il fatto proprio"},{"one":"Il lavoro nobilita l'uomo","two":"Mettersi sotto","three":"Spezzarsi la schiena"},{"one":"Prima il dovere poi il piacere","two":"Essere in ritardo","three":"Battere la fiacca"},{"one":"Il tempo vola","two":"Lasciare tempo al tempo","three":"Arrivare sul filo di lana"},{"one":"Il tempo è galantuomo","two":"Bruciare le tappe","three":"Avere i giorni contati"},{"one":"Ogni cosa a suo tempo","two":"Fare le cose di corsa","three":"Prendersela comoda"},{"one":"La fretta è cattiva consigliera","two":"Correre ai ripari","three":"Andare coi piedi di piombo"},{"one":"Meglio prevenire che curare","two":"Cercare un ago in un pagliaio","three":"Chiudere la stalla quando i buoi sono scappati"},{"one":"Chi cerca trova","two":"Chiedere lumi","three":"Rivoltare come un calzino"},{"one":"Domandare è lecito rispondere è cortesia","two":"Tagliare corto","three":"Battere cassa"},{"one":"A domanda risponde","two":"Avere le carte in regola","three":"Girare intorno al problema"},{"one":"Carta canta","two":"Mettere per iscritto","three":"Scoprire le carte"},{"one":"Verba volant scripta manent","two":"Cucirsi la bocca","three":"Prendere alla lettera"},{"one":"La parola è d'argento il silenzio è d'oro","two":"Tenere la bocca chiusa","three":"Restare senza parole"},{"one":"Il silenzio vale più di mille parole","two":"Parlare a ruota libera","three":"Fare scena muta"},{"one":"Chi troppo parla spesso falla","two":"Prestare orecchio","three":"Perdere il filo del discorso"},{"one":"Non c'è peggior sordo di chi non vuol sentire","two":"Tenere d'occhio","three":"Drizzare le orecchie"},{"one":"Occhio per occhio dente per dente","two":"Saltare all'occhio","three":"Costare un occhio della testa"},{"one":"L'occhio vuole la sua parte","two":"Dare un'occhiata","three":"Avere occhio clinico"},{"one":"Quattro occhi vedono meglio di due","two":"Perdere tempo","three":"Chiudere un occhio"},{"one":"Chi ha tempo non aspetti tempo","two":"Prendere tempo","three":"Ammazzare il tempo"},{"one":"Non rimandare a domani quello che puoi fare oggi","two":"Essere fuori tempo massimo","three":"Menare per le lunghe"},{"one":"A ciascuno il suo","two":"Farsi da parte","three":"Mettere il naso negli affari altrui"},{"one":"Vivi e lascia vivere","two":"Avere un tallone d'Achille","three":"Mettersi nei panni degli altri"},{"one":"Nessuno è perfetto","two":"Salvare le apparenze","three":"Avere scheletri nell'armadio"},{"one":"L'apparenza inganna","two":"Fare bella figura","three":"Gettare fumo negli occhi"},{"one":"Chi di spada ferisce di spada perisce","two":"Avere la resa dei conti","three":"Ripagare con la stessa moneta"},{"one":"Chi la fa l'aspetti","two":"Legarsela al dito","three":"Regolare i conti"},{"one":"Errare è umano perseverare è diabolico","two":"Farsi le ossa","three":"Sbattere la testa contro il muro"}],"CITAZIONI":[{"one":"Essere o non essere","two":"Penso, dunque sono","three":"Conosci te stesso"},{"one":"Il dado è tratto","two":"So di non sapere","three":"Tutto scorre"},{"one":"Veni, vidi, vici","two":"La fortuna aiuta gli audaci","three":"Cogito ergo sum"},{"one":"Eppur si muove","two":"Il fine giustifica i mezzi","three":"La bellezza salverà il mondo"},{"one":"Carpe diem","two":"La conoscenza è potere","three":"L'uomo è misura di tutte le cose"},{"one":"Elementare, Watson!","two":"Uno spettro si aggira per l'Europa","three":"Nel mezzo del cammin di nostra vita"},{"one":"Che la forza sia con te","two":"Ho un sogno","three":"La religione è l'oppio dei popoli"},{"one":"Houston, abbiamo un problema","two":"La fantasia è più importante della conoscenza","three":"Il sonno della ragione genera mostri"},{"one":"Verso l'infinito e oltre!","two":"La vita è ciò che ti accade mentre fai altri progetti","three":"Nessun uomo è un'isola"},{"one":"Torna a casa, Lassie!","two":"Il tempo è un grande maestro","three":"La guerra è la continuazione della politica con altri mezzi"},{"one":"Apriti sesamo!","two":"La verità vi farà liberi","three":"L'inferno sono gli altri"},{"one":"Io sono tuo padre","two":"Il cuore ha le sue ragioni","three":"La proprietà è un furto"},{"one":"Hasta la vista, baby","two":"La pazienza è amara, ma il suo frutto è dolce","three":"La libertà è partecipazione"},{"one":"La vita è bella","two":"L'essenziale è invisibile agli occhi","three":"Il mondo è un palcoscenico"},{"one":"Per aspera ad astra","two":"La speranza è l'ultima a morire","three":"Il silenzio eterno di questi spazi infiniti mi spaventa"},{"one":"Sei forte papà","two":"Il sapere è potere","three":"Chi combatte con i mostri guardi di non diventare un mostro"},{"one":"Tutti per uno, uno per tutti","two":"Il tempo perduto non si ritrova mai","three":"La storia si ripete"},{"one":"Non c'è posto come casa","two":"La semplicità è la massima sofisticazione","three":"Il dubbio è l'inizio della sapienza"},{"one":"La vita è un sogno","two":"La matematica è l'alfabeto con cui Dio ha scritto l'universo","three":"La memoria è il diario che tutti portiamo con noi"},{"one":"Il re è nudo","two":"La penna è più potente della spada","three":"La natura non fa salti"},{"one":"Liberté, égalité, fraternité","two":"La necessità è madre dell'invenzione","three":"L'uomo è nato libero e ovunque è in catene"},{"one":"Alea iacta est","two":"L'occasione fa l'uomo ladro","three":"La storia siamo noi"},{"one":"M'illumino d'immenso","two":"Fatti non foste a viver come bruti","three":"Il naufragar m'è dolce in questo mare"},{"one":"Andrà tutto bene","two":"La vita imita l'arte","three":"Nulla si crea, nulla si distrugge, tutto si trasforma"},{"one":"La verità è là fuori","two":"Il viaggio è la meta","three":"Il carattere è destino"},{"one":"La vita è come andare in bicicletta","two":"La fortuna favorisce gli audaci","three":"L'uomo è condannato a essere libero"},{"one":"Yes we can","two":"La fantasia al potere","three":"La storia di ogni società è storia di lotte di classe"},{"one":"Hasta la victoria siempre","two":"Francamente me ne infischio","three":"Il potere logora chi non ce l'ha"},{"one":"Al mio segnale scatenate l'inferno","two":"Ho visto cose che voi umani...","three":"Toto, ho l'impressione che non siamo più in Kansas"},{"one":"Sono il re del mondo!","two":"Chiamatemi Ismaele","three":"Tutte le famiglie felici si somigliano"},{"one":"Elementare, Watson","two":"Il mio nome è Bond, James Bond","three":"Siamo fatti della stessa sostanza dei sogni"},{"one":"E vissero felici e contenti","two":"C'era una volta","three":"Tutto il mondo è un palcoscenico"},{"one":"Apriti, Sesamo","two":"Sempre caro mi fu quest'ermo colle","three":"Ci sono più cose in cielo e in terra di quante ne sogni la tua filosofia"},{"one":"Lasciate ogne speranza, voi ch'intrate","two":"Ei fu. Siccome immobile","three":"Che cos'è un nome?"},{"one":"Quel ramo del lago di Como","two":"Addio, monti sorgenti dall'acque","three":"Il corso del vero amore non è mai andato liscio"},{"one":"Ridere è una cosa seria","two":"Posso resistere a tutto tranne che alle tentazioni","three":"La moda è una forma di bruttezza così intollerabile che dobbiamo cambiarla ogni sei mesi"},{"one":"La vita è troppo importante per essere presa sul serio","two":"Sii te stesso, tutti gli altri sono già occupati","three":"L'esperienza è il nome che diamo ai nostri errori"},{"one":"Ogni bambino è un artista","two":"La pittura è poesia muta","three":"L'arte scuote dall'anima la polvere accumulata nella vita quotidiana"},{"one":"La semplicità è la sofisticazione suprema","two":"Senza musica la vita sarebbe un errore","three":"La musica è una rivelazione più alta di ogni saggezza"},{"one":"Dove le parole finiscono, inizia la musica","two":"Less is more","three":"L'architettura è musica congelata"},{"one":"Stay hungry, stay foolish","two":"La forma segue la funzione","three":"Dio è nei dettagli"},{"one":"Se puoi sognarlo, puoi farlo","two":"Il modo migliore per predire il futuro è inventarlo","three":"Il successo è l'abilità di passare da un fallimento all'altro senza perdere entusiasmo"},{"one":"Il segreto per andare avanti è iniziare","two":"Il genio è un per cento ispirazione e novantanove per cento sudore","three":"Non ho fallito: ho solo trovato diecimila modi che non funzionano"},{"one":"Un viaggio di mille miglia comincia con un solo passo","two":"Cadi sette volte, rialzati otto","three":"La fortuna è ciò che accade quando la preparazione incontra l'opportunità"},{"one":"Non importa quanto vai piano, purché non ti fermi","two":"Sii il cambiamento che vuoi vedere nel mondo","three":"Prima ti ignorano, poi ti deridono, poi ti combattono, poi vinci"},{"one":"La pace comincia con un sorriso","two":"Occhio per occhio rende il mondo cieco","three":"Non c'è strada per la pace: la pace è la strada"},{"one":"La politica è l'arte del possibile","two":"La democrazia è il peggior sistema di governo, eccetto tutti gli altri","three":"Governare gli italiani non è difficile, è inutile"},{"one":"Divide et impera","two":"Panem et circenses","three":"Parigi val bene una messa"},{"one":"Dubito, dunque penso","two":"Una vita senza ricerca non è degna di essere vissuta","three":"La ragione è la cosa meglio distribuita al mondo"},{"one":"Meglio essere temuti che amati","two":"La fortuna è donna","three":"Lo Stato sono io"},{"one":"Datemi un punto d'appoggio e solleverò il mondo","two":"Eureka!","three":"Dio non gioca a dadi"},{"one":"L'immaginazione è più importante della conoscenza","two":"La cosa più incomprensibile dell'universo è che esso sia comprensibile","three":"La realtà è una semplice illusione, benché molto persistente"},{"one":"Se non puoi spiegarlo semplicemente, non l'hai capito abbastanza","two":"La sopravvivenza del più adatto","three":"La scienza senza religione è zoppa, la religione senza scienza è cieca"},{"one":"La vita trova sempre una strada","two":"Niente in biologia ha senso se non alla luce dell'evoluzione","three":"L'uomo porta ancora nella sua struttura corporea il marchio indelebile della sua umile origine"},{"one":"La matematica è la regina delle scienze","two":"Il tutto è maggiore della somma delle parti","three":"Dio ha creato i numeri interi, tutto il resto è opera dell'uomo"},{"one":"L'uomo è un mistero","two":"La sofferenza è la sola causa della coscienza","three":"Il segreto dell'esistenza non sta nel vivere, ma nel sapere per che cosa si vive"},{"one":"Non si vede bene che con il cuore","two":"Tutti i grandi sono stati bambini una volta","three":"È il tempo che hai perduto per la tua rosa che ha reso la tua rosa così importante"},{"one":"Non tutti quelli che vagano sono perduti","two":"La strada prosegue senza fine","three":"Anche la persona più piccola può cambiare il corso del futuro"},{"one":"Un anello per domarli tutti","two":"La paura uccide la mente","three":"Colui che controlla la spezia controlla l'universo"},{"one":"Il futuro non è scritto","two":"Vieni con me se vuoi vivere","three":"Strade? Dove andiamo non abbiamo bisogno di strade"},{"one":"Grande Giove!","two":"Perché così serio?","three":"Alcuni uomini vogliono solo vedere il mondo bruciare"},{"one":"Con grandi poteri derivano grandi responsabilità","two":"Io sono Iron Man","three":"O muori da eroe o vivi tanto a lungo da diventare il cattivo"},{"one":"Wakanda per sempre","two":"Non puoi gestire la verità!","three":"Tieniti stretto i tuoi amici ma ancora più stretti i tuoi nemici"},{"one":"Lascia la pistola, prendi i cannoli","two":"Gli farò un'offerta che non potrà rifiutare","three":"Un uomo che non passa tempo con la famiglia non può essere un vero uomo"},{"one":"Buongiorno principessa!","two":"Non può piovere per sempre","three":"Le case bruciano, le persone muoiono, ma il vero amore è per sempre"},{"one":"La paura porta alla rabbia","two":"La rabbia porta all'odio","three":"L'odio porta alla sofferenza"},{"one":"La vita è ciò che facciamo di essa","two":"La sorte mescola le carte e noi giochiamo","three":"La vera scoperta non consiste nel cercare nuove terre, ma nell'avere nuovi occhi"},{"one":"Il sapere rende liberi","two":"L'educazione è l'arma più potente per cambiare il mondo","three":"La cultura è ciò che resta quando si è dimenticato tutto"},{"one":"Chi ha un perché per vivere può sopportare quasi ogni come","two":"Diventa ciò che sei","three":"Bisogna avere un caos dentro di sé per generare una stella danzante"},{"one":"Non esistono fatti, solo interpretazioni","two":"Ciò che non mi uccide mi rende più forte","three":"Quando guardi a lungo nell'abisso, l'abisso guarda dentro di te"},{"one":"La felicità dipende da noi stessi","two":"La pazienza è compagna della saggezza","three":"La qualità non è un atto, è un'abitudine"},{"one":"L'uomo saggio non dice tutto ciò che pensa","two":"La speranza è un sogno ad occhi aperti","three":"Le radici dell'educazione sono amare, ma il frutto è dolce"},{"one":"La vita buona è ispirata dall'amore e guidata dalla conoscenza","two":"Il problema del mondo è che gli stupidi sono sicurissimi e gli intelligenti pieni di dubbi","three":"Non morirei mai per le mie convinzioni, perché potrei avere torto"},{"one":"La felicità è reale solo se condivisa","two":"La solitudine dà alla luce l'originalità","three":"La noia è la radice di ogni male"},{"one":"La vita deve essere vissuta in avanti, ma può essere compresa solo all'indietro","two":"La porta della felicità si apre verso l'esterno","three":"Osare è perdere momentaneamente l'equilibrio"},{"one":"La libertà è il diritto di dire alla gente ciò che non vuole sentire","two":"In tempi di inganno universale dire la verità è un atto rivoluzionario","three":"Se la libertà significa qualcosa, significa il diritto di dire ciò che gli altri non vogliono sentire"},{"one":"Non si può attraversare il mare semplicemente fissando l'acqua","two":"La creatività richiede il coraggio di abbandonare le certezze","three":"La logica ti porta da A a B, l'immaginazione ti porta ovunque"},{"one":"Il vero segno dell'intelligenza non è la conoscenza ma l'immaginazione","two":"La curiosità è più importante della conoscenza","three":"Una persona che non ha mai commesso un errore non ha mai provato nulla di nuovo"},{"one":"La scienza è fatta di dati come una casa di pietre","two":"Il caso favorisce la mente preparata","three":"Nella natura nulla si crea dal nulla"},{"one":"La materia non si crea e non si distrugge","two":"La scienza è organizzazione della conoscenza","three":"La ricerca è vedere ciò che tutti hanno visto e pensare ciò che nessuno ha pensato"},{"one":"La medicina è una scienza dell'incertezza e un'arte della probabilità","two":"Prima non nuocere","three":"Dove c'è amore per l'umanità c'è amore per l'arte medica"},{"one":"Il computer è una bicicletta per la mente","two":"Il software sta mangiando il mondo","three":"Qualsiasi tecnologia sufficientemente avanzata è indistinguibile dalla magia"},{"one":"La tecnologia è meglio quando unisce le persone","two":"La semplicità è la massima complessità","three":"La perfezione si raggiunge quando non c'è più nulla da togliere"},{"one":"Il design non è solo come appare, ma come funziona","two":"La creatività è intelligenza che si diverte","three":"Il buon design è il meno design possibile"},{"one":"La fotografia è verità","two":"La fotografia è l'arte di rendere eterno un istante","three":"Non fai una fotografia, la crei"},{"one":"Scrivere è facile: basta fissare un foglio finché non compaiono gocce di sangue sulla fronte","two":"Scrivo per scoprire ciò che so","three":"Non esiste una grande scrittura, esiste solo una grande riscrittura"},{"one":"Leggere è sognare per mano altrui","two":"Un lettore vive mille vite prima di morire","three":"I libri sono specchi: ci vedi dentro quello che hai già dentro di te"},{"one":"Una stanza senza libri è come un corpo senz'anima","two":"I libri sono una magia portatile","three":"Chi legge avrà vissuto cinquemila anni"},{"one":"La poesia è quando un'emozione ha trovato il suo pensiero","two":"La poesia è il ritmo della creazione","three":"Il poeta è un fingitore"},{"one":"Il cinema è la verità ventiquattro volte al secondo","two":"Il cinema sostituisce al nostro sguardo un mondo che si accorda ai nostri desideri","three":"Tutto quello che serve per fare un film è una ragazza e una pistola"},{"one":"Se può essere scritto o pensato, può essere filmato","two":"Il cinema è un mosaico fatto di tempo","three":"Un film non è mai veramente buono se la macchina da presa non è un occhio nella testa di un poeta"},{"one":"La televisione è una chewing gum per gli occhi","two":"Il medium è il messaggio","three":"Il villaggio globale è qui"},{"one":"Il giornalismo è pubblicare ciò che qualcuno non vuole sia pubblicato","two":"La libertà di stampa appartiene a chi possiede una stampa","three":"I fatti sono sacri, i commenti sono liberi"},{"one":"Il calcio è la cosa più importante delle cose meno importanti","two":"Alcune persone pensano che il calcio sia una questione di vita o di morte: è molto di più","three":"La palla è rotonda e la partita dura novanta minuti"},{"one":"Vincere non è tutto, è l'unica cosa","two":"Non conta quante volte cadi, ma quante volte ti rialzi","three":"I campioni continuano a giocare finché non fanno bene"},{"one":"Non ci sono scorciatoie per nessun posto che valga la pena raggiungere","two":"Il dolore è temporaneo, la gloria è per sempre","three":"Il talento vince le partite, il lavoro di squadra vince i campionati"},{"one":"Il mare una volta lanciato il suo incantesimo ti tiene per sempre nella sua rete di meraviglia","two":"Una nave in porto è al sicuro, ma non è per questo che le navi sono costruite","three":"Non puoi scoprire nuovi oceani se non hai il coraggio di perdere di vista la riva"},{"one":"La montagna chiama e io devo andare","two":"Non conquistiamo la montagna, ma noi stessi","three":"In cima alle montagne troviamo noi stessi"},{"one":"Il mondo è un libro e chi non viaggia ne legge una sola pagina","two":"Viaggiare è vivere","three":"Il viaggio è l'unica cosa che compri e ti rende più ricco"},{"one":"Non prendere nulla se non fotografie, non lasciare nulla se non impronte","two":"La Terra non appartiene all'uomo, è l'uomo che appartiene alla Terra","three":"Abbiamo la Terra in prestito dai nostri figli"}]};
+
+const LEVELS = {
+  facile:{label:"LIVELLO FACILE", cats:["OGGETTI","VIVENTI"]},
+  medio:{label:"LIVELLO MEDIO", cats:["PERSONAGGI","LUOGHI"]},
+  difficile:{label:"LIVELLO DIFFICILE", cats:["TITOLI DI FILM","TITOLI DI CANZONI"]},
+  avanzato:{label:"LIVELLO AVANZATO", cats:["PROVERBI E MODI DI DIRE","CITAZIONI"]},
+  pro:{label:"LIVELLO PRO", cats:Object.keys(BUILTIN)},
+  misto:{label:"LIVELLO MISTO", cats:Object.keys(BUILTIN)}
+};
+
+const $=s=>document.querySelector(s);
+const screens=["setupScreen","betweenScreen","chooseScreen","playScreen","resultScreen","gameOverScreen"];
+let state={teams:[],turnMinutes:2,turnsPerTeam:3,current:0,totalCompleted:0,currentCard:null,chosenPoints:0,timer:null,remaining:0,used:{}};
+
+function showScreen(id){screens.forEach(s=>$("#"+s).classList.toggle("hidden",s!==id));window.scrollTo({top:0,behavior:"smooth"});}
+function toast(msg){const t=$("#toast");t.textContent=msg;t.classList.remove("hidden");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.add("hidden"),1700);}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+
+function initTeamsEditor(){
+  const n=+$("#teamCount").value, box=$("#teamsEditor");box.innerHTML="";
+  for(let i=0;i<n;i++){
+    const row=document.createElement("div");row.className="teamRow";
+    row.innerHTML=`<div><label>Nome squadra ${i+1}</label><input class="teamName" value="Squadra ${i+1}" maxlength="24"></div>
+    <div><label>Livello</label><select class="teamLevel">
+      <option value="facile">1 · FACILE</option><option value="medio">2 · MEDIO</option><option value="difficile">3 · DIFFICILE</option>
+      <option value="avanzato">4 · AVANZATO</option><option value="pro">5 · PRO</option><option value="misto">6 · MISTO</option></select></div>`;
+    box.appendChild(row);
+  }
+}
+$("#teamCount").addEventListener("change",()=>{sound("tap");initTeamsEditor();});
+
+function startGame(){
+  sound("start");
+  const names=[...document.querySelectorAll(".teamName")];
+  const levels=[...document.querySelectorAll(".teamLevel")];
+  state={
+    teams:names.map((el,i)=>({name:el.value.trim()||`Squadra ${i+1}`,level:levels[i].value,score:0,turns:0,cardChangeUsed:false})),
+    turnMinutes:+$("#turnMinutes").value,turnsPerTeam:+$("#turnsPerTeam").value,current:0,totalCompleted:0,currentCard:null,chosenPoints:0,
+    timer:null,remaining:0,used:{}
+  };
+  renderBetween();showScreen("betweenScreen");
+}
+
+function customCards(){
+  try{return JSON.parse(localStorage.getItem("scarabocchio_custom_cards")||"[]")}catch{return[]}
+}
+function allCardsFor(cat){
+  const custom=customCards().filter(c=>c.category===cat);
+  return [...(BUILTIN[cat]||[]),...custom.map(c=>({one:c.one,two:c.two,three:c.three,custom:true}))];
+}
+function usedSet(cat){if(!state.used[cat]) state.used[cat]=new Set();return state.used[cat];}
+function pick(arr){return arr[Math.floor(Math.random()*arr.length)]}
+
+function pickCard(level){
+  const cats=LEVELS[level].cats;
+  const cat=pick(cats);
+  const cards=allCardsFor(cat);
+
+  // MISTO: ogni estrazione sceglie prima casualmente una delle 8 categorie
+  // e poi una normale carta 1/2/3 punti di quella categoria.
+  // Se viene usato CAMBIA CARTA, showCard() richiama questa funzione da zero:
+  // quindi anche la categoria può cambiare.
+  if(level==="misto"){
+    const used=usedSet(cat);
+    let available=cards.map((c,i)=>({c,i})).filter(x=>!used.has(x.i));
+    if(!available.length){used.clear();available=cards.map((c,i)=>({c,i}));}
+    const got=pick(available);used.add(got.i);
+    return {category:cat,...got.c};
+  }
+
+  if(level!=="pro"){
+    const used=usedSet(cat);
+    let available=cards.map((c,i)=>({c,i})).filter(x=>!used.has(x.i));
+    if(!available.length){used.clear();available=cards.map((c,i)=>({c,i}));}
+    const got=pick(available);used.add(got.i);
+    return {category:cat,...got.c};
+  }
+
+  // PRO: può uscire qualunque categoria, ma le tre proposte
+  // vengono ricavate esclusivamente dai soggetti più difficili.
+  const hard=cards.map(x=>x.three).filter(Boolean);
+  const n=hard.length;
+  const a=hard.slice(Math.floor(n*.35),Math.max(Math.floor(n*.60),1));
+  const b=hard.slice(Math.floor(n*.60),Math.max(Math.floor(n*.82),1));
+  const c=hard.slice(Math.floor(n*.82));
+  const one=pick(a.length?a:hard), two=pick(b.length?b:hard), three=pick(c.length?c:hard);
+  return {category:cat,one,two,three,pro:true};
+}
+
+function renderBetween(){
+  const t=state.teams[state.current];
+  $("#turnTeam").textContent=t.name;
+  $("#turnCounter").textContent=`Turno ${t.turns+1} di ${state.turnsPerTeam}`;
+  $("#levelBadge").textContent=LEVELS[t.level].label;
+  renderScores("#miniScores");
+}
+function showCard(){
+  sound("reveal");
+  const t=state.teams[state.current];
+  state.currentCard=pickCard(t.level);
+  $("#cardCategory").textContent=state.currentCard.category;
+  $("#choices").innerHTML=[
+    [1,state.currentCard.one],[2,state.currentCard.two],[3,state.currentCard.three]
+  ].map(([p,txt])=>`<button class="choice" data-p="${p}"><span class="choiceText">${esc(txt)}</span><span class="points">${"★".repeat(p)} · ${p} ${p===1?"PUNTO":"PUNTI"}</span></button>`).join("");
+  document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>choosePrompt(+b.dataset.p));
+  const changeBtn=$("#changeCardBtn"), changeNote=$("#changeCardNote");
+  const currentTeam=state.teams[state.current];
+  if(currentTeam.cardChangeUsed){
+    changeBtn.classList.add("hidden");
+    changeNote.textContent=`${currentTeam.name} ha già utilizzato il proprio cambio carta.`;
+  }else{
+    changeBtn.classList.remove("hidden");
+    changeBtn.textContent="CAMBIA CARTA · JOLLY DELLA SQUADRA";
+    changeNote.textContent=`${currentTeam.name} può cambiare carta una sola volta nell'intera partita.`;
+  }
+  showScreen("chooseScreen");
+}
+function choosePrompt(points){
+  sound("select");
+  state.chosenPoints=points;
+  $("#playTeam").textContent=state.teams[state.current].name;
+  $("#playCategory").textContent=state.currentCard.category;
+  $("#inPlay").textContent=`${"★".repeat(points)} ${points} ${points===1?"PUNTO":"PUNTI"} IN GIOCO`;
+  showScreen("playScreen");startTimer();
+}
+function startTimer(){
+  clearInterval(state.timer);
+  state.remaining=state.turnMinutes*60;
+  updateTimer();
+  state.timer=setInterval(()=>{
+    state.remaining--;
+    if(state.remaining<=5 && state.remaining>0) sound("count");
+    if(state.remaining<=0){clearInterval(state.timer);state.remaining=0;updateTimer();finishTurn("timeout");return;}
+    updateTimer();
+  },1000);
+}
+function updateTimer(){
+  const m=Math.floor(state.remaining/60),s=state.remaining%60;
+  $("#timerText").textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`;
+  const total=state.turnMinutes*60, pct=total?Math.max(0,state.remaining/total):0;
+  $("#timer").style.setProperty("--p",`${pct*360}deg`);
+}
+function finishTurn(type){
+  clearInterval(state.timer);
+  const t=state.teams[state.current];
+  let pts=0;
+  if(type==="guessed"){pts=state.chosenPoints;t.score+=pts;sound("correct");}
+  else if(type==="timeout") sound("timeout");
+  else sound("abandon");
+  t.turns++; state.totalCompleted++;
+  $("#resultTitle").textContent=type==="guessed"?"INDOVINATO!":type==="timeout"?"TEMPO SCADUTO!":"TURNO ABBANDONATO";
+  $("#resultMain").textContent=pts?`+${pts}`:"0 PUNTI";
+  $("#resultText").textContent=pts?`${t.name} sale a ${t.score} punti.`:`${t.name} resta a ${t.score} punti.`;
+  const done=state.teams.every(x=>x.turns>=state.turnsPerTeam);
+  $("#nextBtn").textContent=done?"VEDI RISULTATO":"TURNO SUCCESSIVO";
+  $("#nextBtn").onclick=()=>done?endGame():advance();
+  showScreen("resultScreen");
+}
+function advance(){
+  let tries=0;
+  do{state.current=(state.current+1)%state.teams.length;tries++;}while(state.teams[state.current].turns>=state.turnsPerTeam && tries<=state.teams.length);
+  renderBetween();showScreen("betweenScreen");
+}
+function endGame(){
+  const sorted=[...state.teams].sort((a,b)=>b.score-a.score);
+  const best=sorted[0].score,winners=sorted.filter(x=>x.score===best);
+  $("#winnerText").textContent=winners.length===1?`VINCE ${winners[0].name}!`:`PAREGGIO: ${winners.map(x=>x.name).join(" · ")}`;
+  renderScores("#finalScores");
+  sound("victory");showScreen("gameOverScreen");
+}
+function renderScores(sel){
+  const sorted=[...state.teams].sort((a,b)=>b.score-a.score);
+  $(sel).innerHTML=sorted.map((t,i)=>`<div class="scoreRow"><div class="rank">${i+1}.</div><div><div class="scoreName">${esc(t.name)}</div><div class="note">${LEVELS[t.level].label} · ${t.turns}/${state.turnsPerTeam} turni · Cambio carta: ${t.cardChangeUsed?"usato":"disponibile"}</div></div><div class="scorePts">${t.score} pt</div></div>`).join("");
+}
+
+function openModal(html){$("#modalBox").innerHTML=html;$("#modal").classList.remove("hidden");$("#modalBox").querySelectorAll("[data-close]").forEach(b=>b.onclick=closeModal);}
+function closeModal(){sound("tap");$("#modal").classList.add("hidden");}
+$("#modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModal();});
+
+function instructions(){
+  sound("tap");
+  openModal(`<div class="modalTop"><h2>ISTRUZIONI</h2><button class="closeBtn" data-close>CHIUDI</button></div>
+  <details open><summary>COME SI GIOCA</summary>
+    <ol>
+      <li>Imposta da 2 a 6 squadre, assegna un nome e uno dei <b>6 livelli</b> a ciascuna. Il livello <b>MISTO</b> pesca casualmente da tutte le categorie del gioco.</li>
+      <li>Scegli la durata di ogni turno (1–5 minuti) e il numero di turni per squadra.</li>
+      <li>Al proprio turno il disegnatore guarda la carta segreta e può dire alla squadra <b>solo la categoria</b>.</li>
+      <li>Ogni carta propone tre soggetti: ★ 1 punto, ★★ 2 punti, ★★★ 3 punti. Il disegnatore sceglie liberamente quanto rischiare.</li>
+      <li><b>Ogni squadra può cambiare carta una sola volta nell’intera partita.</b> Prima di scegliere il soggetto, può scartare la carta mostrata e chiederne una nuova. Il jolly appartiene alla singola squadra: quando viene usato, quella squadra non potrà più cambiare carta nei turni successivi.</li>
+      <li>Appena tocca il soggetto, questo sparisce e parte il timer. L'app ricorda automaticamente il valore scelto.</li>
+      <li>Se la squadra indovina, tocca <b>INDOVINATO!</b> e il punteggio viene sommato automaticamente.</li>
+      <li>Se scade il tempo o si tocca <b>ABBANDONO</b>, il turno vale 0 punti.</li>
+      <li>Quando tutte le squadre hanno completato i turni stabiliti, vince chi ha più punti. Sono possibili ex aequo.</li>
+    </ol>
+  </details>
+  <details><summary>REGOLE DEL DISEGNO</summary>
+    <ul>
+      <li>Non si può parlare, mimare, fare versi o suggerire con la voce.</li>
+      <li>Non si possono scrivere lettere, parole, numeri, iniziali o abbreviazioni.</li>
+      <li>Non si possono usare trattini o spazi per suggerire il numero di lettere o di parole.</li>
+      <li>Si possono usare liberamente disegni, forme, frecce, simboli grafici e schemi.</li>
+      <li>Il disegnatore può comunicare alla squadra la <b>categoria</b> indicata sopra la carta.</li>
+    </ul>
+  </details>
+  <details><summary>LIVELLI E CATEGORIE</summary>
+    <p><b>FACILE · bambini</b><br>OGGETTI: cose concrete di uso quotidiano o facilmente riconoscibili.<br>VIVENTI: animali, piante, funghi e altri organismi.</p>
+    <p><b>MEDIO · adolescenti</b><br>PERSONAGGI: persone reali e personaggi immaginari, storici, letterari, cinematografici, televisivi o dei fumetti.<br>LUOGHI: luoghi reali o fantastici, monumenti, città, paesaggi e ambientazioni famose.</p>
+    <p><b>DIFFICILE · adulti</b><br>TITOLI DI FILM: titoli italiani o internazionali noti in Italia.<br>TITOLI DI CANZONI: brani italiani o internazionali conosciuti in Italia.</p>
+    <p><b>AVANZATO · sfide difficili</b><br>PROVERBI E MODI DI DIRE: espressioni della lingua italiana.<br>CITAZIONI: frasi celebri conosciute in Italia, anche di origine straniera ma presentate nella traduzione italiana più comune.</p>
+    <p><b>PRO · sfide difficilissime!</b><br>Può uscire qualunque categoria precedente, ma l'app pesca esclusivamente tra i soggetti più difficili del relativo archivio.</p>
+    <p><b>MISTO · tutte le categorie</b><br>A ogni turno l'app sceglie casualmente una delle <b>8 categorie</b> presenti nel gioco e mostra una normale carta con soggetti da ★ 1, ★★ 2 e ★★★ 3 punti. Se la squadra usa il proprio <b>CAMBIA CARTA</b>, viene effettuata una nuova estrazione completa: la nuova carta può quindi appartenere anche a una categoria diversa.</p>
+  </details>
+  <details><summary>CARTE E PRIVACY</summary>
+    <p>Le carte integrate e le eventuali carte personalizzate restano nel browser del dispositivo. Nessun contenuto della partita viene inviato online.</p>
+  </details>
+  <details><summary>CREDITI</summary>
+    <p><b>SCARABOCCHIO!</b></p>
+    <p><b>Ideazione e contenuti:</b> Flavio Naretti<br>
+    <b>Progettazione e sviluppo dell’app:</b> Flavio Naretti con il supporto di ChatGPT (OpenAI)</p>
+    <p><b>Codice:</b> distribuito secondo licenza GNU GPL v3.0.<br>
+    <b>Contenuti originali:</b> © 2026 Flavio Naretti.</p>
+    <p class="note">L’app funziona interamente nel browser: i dati della partita e le carte personalizzate restano sul dispositivo. Per la pubblicazione su GitHub verranno affiancati i consueti file LICENSE e LICENSE-CONTENUTI.md.</p>
+  </details>`);
+}
+
+function scoresModal(){
+  sound("tap");
+  const body=state.teams.length?`<div class="scoreList">${[...state.teams].sort((a,b)=>b.score-a.score).map((t,i)=>`<div class="scoreRow"><div class="rank">${i+1}.</div><div class="scoreName">${esc(t.name)}</div><div class="scorePts">${t.score} pt</div></div>`).join("")}</div>`:`<p>Nessuna partita in corso.</p>`;
+  openModal(`<div class="modalTop"><h2>CLASSIFICA</h2><button class="closeBtn" data-close>CHIUDI</button></div>${body}`);
+}
+
+function cardsManager(){
+  sound("tap");
+  const custom=customCards();
+  openModal(`<div class="modalTop"><h2>GESTIONE CARTE</h2><button class="closeBtn" data-close>CHIUDI</button></div>
+    <p class="note">Le carte personalizzate vengono aggiunte ai mazzi integrati e restano soltanto su questo dispositivo.</p>
+    <div class="grid two">
+      <div><label>Categoria</label><select id="customCat">${Object.keys(BUILTIN).map(c=>`<option>${c}</option>`).join("")}</select></div>
+      <div><label>★ 1 punto</label><input id="c1" placeholder="Soggetto facile"></div>
+      <div><label>★★ 2 punti</label><input id="c2" placeholder="Soggetto medio"></div>
+      <div><label>★★★ 3 punti</label><input id="c3" placeholder="Soggetto difficile"></div>
+    </div>
+    <button class="primary full" id="addCustom">AGGIUNGI CARTA</button>
+    <p><b>Carte personalizzate:</b> ${custom.length}</p>
+    <div class="smallBtns"><button class="secondary" id="exportCustom">ESPORTA</button><label class="secondary" style="display:inline-block;cursor:pointer">IMPORTA<input id="importCustom" type="file" accept="application/json" hidden></label><button class="danger" id="resetCustom">ELIMINA PERSONALIZZATE</button></div>
+    <p class="note">Mazzo completo: 100 carte integrate per ciascuna delle 8 categorie, per un totale di 800 carte e 2.400 soggetti/frasi. Le carte personalizzate si aggiungono a quelle integrate.</p>`);
+  $("#addCustom").onclick=()=>{
+    const one=$("#c1").value.trim(),two=$("#c2").value.trim(),three=$("#c3").value.trim();
+    if(!one||!two||!three){toast("Compila tutti e tre i soggetti");return;}
+    const arr=customCards();arr.push({category:$("#customCat").value,one,two,three});localStorage.setItem("scarabocchio_custom_cards",JSON.stringify(arr));toast("Carta aggiunta");cardsManager();
+  };
+  $("#exportCustom").onclick=()=>{
+    const blob=new Blob([JSON.stringify(customCards(),null,2)],{type:"application/json"}),a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);a.download="scarabocchio-carte-personalizzate.json";a.click();URL.revokeObjectURL(a.href);
+  };
+  $("#importCustom").onchange=e=>{
+    const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{try{const arr=JSON.parse(r.result);if(!Array.isArray(arr))throw 0;localStorage.setItem("scarabocchio_custom_cards",JSON.stringify(arr));toast("Carte importate");cardsManager();}catch{toast("File non valido");}};
+    r.readAsText(f);
+  };
+  $("#resetCustom").onclick=()=>{if(confirm("Eliminare tutte le carte personalizzate?")){localStorage.removeItem("scarabocchio_custom_cards");toast("Carte personalizzate eliminate");cardsManager();}};
+}
+
+function goHome(){
+  sound("tap");
+  if(state.teams.length && !confirm("Tornare alla HOME? La partita in corso verrà abbandonata."))return;
+  clearInterval(state.timer);state={teams:[],turnMinutes:2,turnsPerTeam:3,current:0,totalCompleted:0,currentCard:null,chosenPoints:0,timer:null,remaining:0,used:{}};
+  showScreen("setupScreen");
+}
+function toggleTheme(){
+  sound("tap");document.body.classList.toggle("dark");
+  const dark=document.body.classList.contains("dark");localStorage.setItem("scarabocchio_theme",dark?"dark":"light");
+  $("#themeBtn").textContent=dark?"☀ GIORNO":"☾ NOTTE";
+}
+
+let audioCtx;
+function ctx(){audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();return audioCtx;}
+function tone(freq,dur=0.08,delay=0,type="sine",gain=.045){
+  const c=ctx(),o=c.createOscillator(),g=c.createGain(),t=c.currentTime+delay;
+  o.type=type;o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(gain,t);g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+dur);
+}
+function sound(kind){
+  try{
+    if(kind==="tap")tone(460,.045,0,"square",.018);
+    if(kind==="select"){tone(520,.06);tone(700,.07,.05);}
+    if(kind==="reveal"){tone(330,.05);tone(440,.06,.05);tone(660,.08,.11);}
+    if(kind==="start"){tone(330,.08);tone(494,.08,.08);tone(659,.12,.16);}
+    if(kind==="count")tone(880,.055,0,"square",.035);
+    if(kind==="correct"){tone(523,.09);tone(659,.09,.08);tone(784,.18,.16);}
+    if(kind==="abandon"){tone(330,.12);tone(247,.18,.10);}
+    if(kind==="timeout"){tone(220,.18,0,"sawtooth",.04);tone(165,.28,.16,"sawtooth",.04);}
+    if(kind==="victory"){[523,659,784,1047].forEach((f,i)=>tone(f,.18,i*.10,"triangle",.05));}
+  }catch{}
+}
+
+$("#startBtn").onclick=startGame;
+$("#showCardBtn").onclick=showCard;
+$("#changeCardBtn").onclick=()=>{
+  const currentTeam=state.teams[state.current];
+  if(currentTeam.cardChangeUsed){toast(`${currentTeam.name} ha già utilizzato il cambio carta`);return;}
+  currentTeam.cardChangeUsed=true;
+  sound("reveal");
+  toast(`${currentTeam.name}: cambio carta utilizzato`);
+  showCard();
+};
+$("#guessedBtn").onclick=()=>finishTurn("guessed");
+$("#abandonBtn").onclick=()=>finishTurn("abandon");
+$("#newGameBtn").onclick=()=>{sound("tap");state.teams=[];showScreen("setupScreen");};
+$("#infoBtn").onclick=instructions;
+$("#scoresBtn").onclick=scoresModal;
+$("#cardsBtn").onclick=cardsManager;
+$("#homeBtn").onclick=goHome;
+$("#themeBtn").onclick=toggleTheme;
+
+if(localStorage.getItem("scarabocchio_theme")==="dark"){document.body.classList.add("dark");$("#themeBtn").textContent="☀ GIORNO";}
+initTeamsEditor();
+</script>
+
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+  });
+}
+</script>
+
+</body>
+</html>
