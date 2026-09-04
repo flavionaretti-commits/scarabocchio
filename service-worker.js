@@ -1,4 +1,4 @@
-const CACHE_NAME = "scarabocchio-v1";
+const CACHE_NAME = "scarabocchio-v2";
 const APP_FILES = [
   "./",
   "./index.html",
