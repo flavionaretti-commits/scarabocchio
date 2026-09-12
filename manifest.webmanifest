@@ -2,6 +2,7 @@
   "name": "SCARABOCCHIO!",
   "short_name": "SCARABOCCHIO!",
   "description": "Party game di disegno a squadre con livelli di difficoltà personalizzabili.",
+  "id": "/scarabocchio/",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
